@@ -1,2 +1,9 @@
 # API requirements
 
+aio-pika
+boto3
+fastapi
+pydantic
+pydantic-settings
+python-multipart
+uvicorn

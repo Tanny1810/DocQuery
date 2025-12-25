@@ -1,0 +1,40 @@
+from pydantic_settings import BaseSettings
+from pydantic import model_validator
+from typing import Optional
+
+class CloudConfig(BaseSettings):
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_TE_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_TE_SECRET_ACCESS_KEY: str = ""
+    AWS_REGION: str = ""
+    S3_BUCKET_NAME: str = ""
+
+class QueueConfig(BaseSettings):
+    RABBITMQ_USER: str = ""
+    RABBITMQ_PASSWORD: str = ""
+    RABBITMQ_HOST: str = ""
+    RABBITMQ_PORT: int = 5672
+    QUEUE_NAME: str = ""
+
+class Settings(BaseSettings):
+    APP_NAME: str = "DocQuery Application"
+    ENV: str = "dev"
+    DEBUG: bool = True
+
+    CLOUD_CONFIG: Optional[CloudConfig] = None
+    QUEUE_CONFIG: Optional[QueueConfig] = None
+
+    @model_validator(mode='after')
+    def build_nested_configs(self):
+        if self.CLOUD_CONFIG is None:
+            self.CLOUD_CONFIG = CloudConfig()
+        if self.QUEUE_CONFIG is None:
+            self.QUEUE_CONFIG = QueueConfig()
+        return self
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()
