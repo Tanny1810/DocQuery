@@ -9,13 +9,16 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENV=dev
-      - DEBUG=true
+      - ENV=${ENV}
+      - DEBUG=${DEBUG}
     env_file:
       - .env
     volumes:
       - ./api:/app/api
       - ./shared:/app/shared
+    depends_on:
+      queue:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
@@ -23,3 +26,29 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    networks:
+      - docquery-network
+
+  queue:
+    image: rabbitmq:3-management
+    container_name: docquery-queue
+    ports:
+      - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+      - ${RABBITMQ_DASHBOARD_PORT}:${RABBITMQ_DASHBOARD_PORT}
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - docquery-network
+
+networks:
+  docquery-network:
+    driver: bridge
