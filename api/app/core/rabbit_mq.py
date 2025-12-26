@@ -1,13 +1,20 @@
-import json
+import json, os
 from aio_pika import connect_robust, Message
 from api.app.core.config import settings
+from shared.config.logging import get_logger
 
-RABBITMQ_URL = (
-    f"amqp://{settings.QUEUE_CONFIG.RABBITMQ_USER}:"
-    f"{settings.QUEUE_CONFIG.RABBITMQ_PASSWORD}@"
-    f"{settings.QUEUE_CONFIG.RABBITMQ_HOST}:"
-    f"{settings.QUEUE_CONFIG.RABBITMQ_PORT}/"
-)
+logger = get_logger(__name__)
+
+def get_rabbitmq_url() -> str:
+    """Get RabbitMQ URL, using service name in Docker, localhost otherwise"""
+    host = settings.QUEUE_CONFIG.RABBITMQ_HOST
+    user = settings.QUEUE_CONFIG.RABBITMQ_USER
+    password = settings.QUEUE_CONFIG.RABBITMQ_PASSWORD
+    port = settings.QUEUE_CONFIG.RABBITMQ_PORT
+    
+    return f"amqp://{user}:{password}@{host}:{port}/"
+
+RABBITMQ_URL = get_rabbitmq_url()
 
 QUEUE_NAME = settings.QUEUE_CONFIG.QUEUE_NAME
 
@@ -15,7 +22,7 @@ QUEUE_NAME = settings.QUEUE_CONFIG.QUEUE_NAME
 async def publish_message(payload: dict):
     connection = None
     try:
-        print("Connecting to RabbitMQ")
+        logger.info("Connecting to RabbitMQ")
 
         connection = await connect_robust(RABBITMQ_URL)
         channel = await connection.channel()
@@ -31,13 +38,13 @@ async def publish_message(payload: dict):
             routing_key=queue.name,
         )
 
-        print("Message published")
+        logger.info("Message published")
 
-    except Exception as e:
-        print(f"Error publishing message to RabbitMQ: {e}")
+    except Exception:
+        logger.exception("Error publishing message to RabbitMQ")
         raise
 
     finally:
         if connection:
             await connection.close()
-            print("Disconnected from RabbitMQ")
+            logger.info("Disconnected from RabbitMQ")

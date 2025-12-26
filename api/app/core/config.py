@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "DocQuery Application"
     ENV: str = "dev"
     DEBUG: bool = True
+    LOG_LEVEL: str = "INFO"
 
     CLOUD_CONFIG: Optional[CloudConfig] = None
     QUEUE_CONFIG: Optional[QueueConfig] = None
