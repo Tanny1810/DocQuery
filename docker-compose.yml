@@ -29,6 +29,20 @@ services:
     networks:
       - docquery-network
 
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    container_name: docquery-worker
+    env_file:
+      - .env
+    depends_on:
+      queue:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - docquery-network
+
   queue:
     image: rabbitmq:3-management
     container_name: docquery-queue

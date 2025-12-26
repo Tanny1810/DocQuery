@@ -1,2 +1,6 @@
 # Worker requirements
 
+aio-pika==9.4.0
+boto3==1.34.162
+pydantic
+pydantic-settings==2.4.0
