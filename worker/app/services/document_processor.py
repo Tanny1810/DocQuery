@@ -1,18 +1,23 @@
 from app.services.storage_service import download_file_from_s3
+from app.processors.text_extractor import extract_text
+from app.processors.chunker import chunk_text
+from app.processors.embedder import embed_chunks
+from app.db.vector_store import store_embeddings, get_vector_count
 
 
 async def process_document(payload: dict):
     bucket = payload["bucket"]
     key = payload["key"]
 
-    print(f"⚙️ Processing document s3://{bucket}/{key}")
+    file_path = download_file_from_s3(bucket, key)
 
-    local_path = download_file_from_s3(bucket, key)
+    text = extract_text(file_path)
+    chunks = chunk_text(text)
 
-    print(f"📂 File downloaded to {local_path}")
+    embeddings = embed_chunks(chunks)
+    store_embeddings(embeddings)
 
-    # NEXT STEPS (later):
-    # text = extract_text(local_path)
-    # chunks = chunk_text(text)
-    # embeddings = embed(chunks)
-    # store_embeddings(embeddings)
+    print(f"✅ Stored {len(embeddings)} embeddings")
+
+    store_embeddings(embeddings)
+    print(f"📊 Total vectors in FAISS: {get_vector_count()}")

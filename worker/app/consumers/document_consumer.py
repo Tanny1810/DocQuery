@@ -1,6 +1,6 @@
 import asyncio
 import json
-import aio_pika
+from aio_pika import connect_robust, IncomingMessage
 from app.services.document_processor import process_document
 from app.config import settings
 
@@ -14,7 +14,7 @@ def get_rabbitmq_url() -> str:
     return f"amqp://{user}:{password}@{host}:{port}/"
 
 
-async def handle_message(message: aio_pika.IncomingMessage):
+async def handle_message(message: IncomingMessage):
     async with message.process():
         payload = json.loads(message.body)
         print("📩 Received document job")
@@ -22,10 +22,10 @@ async def handle_message(message: aio_pika.IncomingMessage):
 
 
 async def start_document_consumer(queue_name: str):
-    rabbitmq_url = get_rabbitmq_url()
+    RABBITMQ_URL = get_rabbitmq_url()
 
     print("🔌 Connecting to RabbitMQ...")
-    connection = await aio_pika.connect_robust(rabbitmq_url)
+    connection = await connect_robust(RABBITMQ_URL)
     channel = await connection.channel()
 
     await channel.set_qos(prefetch_count=1)
