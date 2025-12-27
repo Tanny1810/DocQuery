@@ -3,7 +3,9 @@ from app.processors.text_extractor import extract_text
 from app.processors.chunker import chunk_text
 from app.processors.embedder import embed_chunks
 from app.db.vector_store import store_embeddings, get_vector_count
+from shared.config.logging import get_logger
 
+logger = get_logger(__name__)
 
 async def process_document(payload: dict):
     bucket = payload["bucket"]
@@ -17,7 +19,5 @@ async def process_document(payload: dict):
     embeddings = embed_chunks(chunks)
     store_embeddings(embeddings)
 
-    print(f"✅ Stored {len(embeddings)} embeddings")
-
-    store_embeddings(embeddings)
-    print(f"📊 Total vectors in FAISS: {get_vector_count()}")
+    logger.info(f"✅ Stored {len(embeddings)} embeddings")
+    logger.info(f"📊 Total vectors in FAISS: {get_vector_count()}")

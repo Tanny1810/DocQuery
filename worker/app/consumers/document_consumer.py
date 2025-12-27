@@ -3,6 +3,9 @@ import json
 from aio_pika import connect_robust, IncomingMessage
 from app.services.document_processor import process_document
 from app.config import settings
+from shared.config.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_rabbitmq_url() -> str:
@@ -17,14 +20,14 @@ def get_rabbitmq_url() -> str:
 async def handle_message(message: IncomingMessage):
     async with message.process():
         payload = json.loads(message.body)
-        print("📩 Received document job")
+        logger.info("📩 Received document job")
         await process_document(payload)
 
 
 async def start_document_consumer(queue_name: str):
     RABBITMQ_URL = get_rabbitmq_url()
 
-    print("🔌 Connecting to RabbitMQ...")
+    logger.info("🔌 Connecting to RabbitMQ...")
     connection = await connect_robust(RABBITMQ_URL)
     channel = await connection.channel()
 
@@ -33,7 +36,7 @@ async def start_document_consumer(queue_name: str):
 
     await queue.consume(handle_message)
 
-    print("👂 Worker listening for document ingestion jobs...")
+    logger.info("👂 Worker listening for document ingestion jobs...")
 
     # 🔥 KEEP PROCESS ALIVE
     await asyncio.Future()  # runs forever

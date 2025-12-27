@@ -24,5 +24,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY worker/app ./app
 
+# Copy shared module (needed by Worker)
+COPY shared/ shared/
+
 # Default command
 CMD ["python", "-m", "app.main"]

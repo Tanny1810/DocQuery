@@ -8,6 +8,6 @@ def embed_chunks(chunks: list[str]) -> list[list[float]]:
     embeddings = _model.encode(
         chunks,
         convert_to_numpy=True,
-        show_progress_bar=False
+        show_progress_bar=True
     )
     return embeddings.tolist()
