@@ -117,13 +117,6 @@ sequenceDiagram
 
     W->>DB: Update document status (PROCESSED)
 ```
-1. Upload document
-2. Extract text (PDF / DOCX)
-3. Chunk text
-4. Generate embeddings
-5. Store vectors
-6. Perform semantic search (Top-K)
-7. Generate answer using LLM + retrieved context
 
 ---
 
@@ -219,7 +212,7 @@ stateDiagram-v2
     PROCESSING --> RETRYING: Recoverable error
     RETRYING --> QUEUED: Re-queued for another attempt
 
-    state "User-Initiated Actions" {
+    state "User-Initiated Actions" as UIA {
         UPLOADED --> CANCELLED
         QUEUED --> CANCELLED
         READY --> DELETED
