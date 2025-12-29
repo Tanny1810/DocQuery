@@ -1,9 +1,12 @@
 # API requirements
 
 aio-pika
+alembic==1.13.2
 boto3
 fastapi
+psycopg2-binary==2.9.9
 pydantic
 pydantic-settings
 python-multipart
+sqlalchemy==2.0.30
 uvicorn
