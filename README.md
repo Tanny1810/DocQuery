@@ -173,28 +173,36 @@ sequenceDiagram
 
 ## 📁 Project Structure
 
+```text
 docquery/
 ├── api/
-│ ├── routers/ # API endpoints
-│ ├── services/ # Business logic
-│ ├── db/ # ORM models & repositories
-│ └── main.py
+│   ├── app/
+│   │   ├── core/         # Core components (settings, middleware)
+│   │   ├── db/           # Database repositories and session
+│   │   ├── models/       # SQLAlchemy ORM models
+│   │   ├── routers/      # API endpoints (v1)
+│   │   ├── services/     # Business logic
+│   │   └── main.py       # FastAPI application entrypoint
+│   ├── alembic/          # Database migrations
+│   └── Dockerfile
 │
 ├── worker/
-│ ├── consumers/ # RabbitMQ consumers
-│ ├── processors/ # Extraction, chunking, embedding
-│ └── main.py
+│   ├── app/
+│   │   ├── consumers/    # RabbitMQ message consumers
+│   │   ├── processors/   # Text extraction, chunking, embedding
+│   │   └── main.py       # Worker application entrypoint
+│   └── Dockerfile
 │
 ├── shared/
-│ ├── config/ # Centralized config
-│ ├── constants/ # Enums & status definitions
-│ └── utils/
+│   ├── config/           # Shared logging and settings
+│   ├── embeddings/       # AI model and embedding utilities
+│   ├── storage/          # Cloud storage clients
+│   └── utils/            # Common utilities
 │
-├── docs/
-│ └── architecture.png
-│
+├── data/                   # Sample data for testing
 ├── docker-compose.yml
 └── README.md
+```
 
 ---
 
