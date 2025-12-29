@@ -212,12 +212,10 @@ stateDiagram-v2
     PROCESSING --> RETRYING: Recoverable error
     RETRYING --> QUEUED: Re-queued for another attempt
 
-    state "User-Initiated Actions" as UIA {
-        UPLOADED --> CANCELLED
-        QUEUED --> CANCELLED
-        READY --> DELETED
-        FAILED --> DELETED
-    }
+    UPLOADED --> CANCELLED: User action
+    QUEUED --> CANCELLED: User action
+    READY --> DELETED: User action
+    FAILED --> DELETED: User action
 ```
 
 -   `UPLOADED`: The document has been successfully uploaded and a corresponding record is created. It is awaiting to be queued for processing.
