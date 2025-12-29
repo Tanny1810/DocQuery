@@ -117,6 +117,16 @@ sequenceDiagram
 
     W->>DB: Update document status (PROCESSED)
 ```
+1. Upload document
+2. Extract text (PDF / DOCX)
+3. Chunk text
+4. Generate embeddings
+5. Store vectors
+6. Perform semantic search (Top-K)
+7. Generate answer using LLM + retrieved context
+
+---
+
 
 ## 🧠 RAG Processing Flow
 
@@ -133,17 +143,6 @@ sequenceDiagram
                 │
                 ▼
             Final Answer
-
----
-
-
-1. Upload document
-2. Extract text (PDF / DOCX)
-3. Chunk text
-4. Generate embeddings
-5. Store vectors
-6. Perform semantic search (Top-K)
-7. Generate answer using LLM + retrieved context
 
 ---
 
@@ -208,14 +207,35 @@ docquery/
 
 ## 🔄 Document Lifecycle
 
-Each document follows a clear lifecycle:
+The lifecycle of a document is explicitly tracked through a series of statuses, providing clear observability into the ingestion and processing pipeline.
 
-- `UPLOADED` — File received and stored
-- `PROCESSING` — Worker is handling the document
-- `PROCESSED` — Embeddings successfully stored
-- `FAILED` — Error during processing
+```mermaid
+stateDiagram-v2
+    [*] --> UPLOADED
+    UPLOADED --> QUEUED: Document processing task added
+    QUEUED --> PROCESSING: Worker consumes task
+    PROCESSING --> READY: Processing successful
+    PROCESSING --> FAILED: Non-recoverable error
+    PROCESSING --> RETRYING: Recoverable error
+    RETRYING --> QUEUED: Re-queued for another attempt
 
-This makes the system **observable, debuggable, and production-ready**.
+    state "User-Initiated Actions" {
+        UPLOADED --> CANCELLED
+        QUEUED --> CANCELLED
+        READY --> DELETED
+        FAILED --> DELETED
+    }
+```
+
+-   `UPLOADED`: The document has been successfully uploaded and a corresponding record is created. It is awaiting to be queued for processing.
+-   `QUEUED`: A processing task for the document has been published to the message queue.
+-   `PROCESSING`: A worker is actively processing the document (extracting text, chunking, and generating embeddings).
+-   `READY`: The document has been fully processed and its vector embeddings are available for querying.
+-   `FAILED`: Processing failed due to a non-recoverable error. Manual intervention may be required.
+-   `RETRYING`: Processing failed with a recoverable error. The system will automatically re-queue the task for another attempt.
+-   `PARTIAL`: The document was only partially processed due to errors with specific sections. Some content may be available for querying.
+-   `CANCELLED`: A user or an automated process cancelled the processing task before completion.
+-   `DELETED`: The document and all its associated data have been permanently deleted from the system.
 
 ---
 
