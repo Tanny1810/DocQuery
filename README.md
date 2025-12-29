@@ -91,6 +91,7 @@ DocQuery solves this by:
 
 ```mermaid
 sequenceDiagram
+
     autonumber
 
     participant U as User / Client
@@ -115,7 +116,7 @@ sequenceDiagram
     W->>VDB: Store vectors
 
     W->>DB: Update document status (PROCESSED)
----
+```
 
 ## 🧠 RAG Processing Flow
 
