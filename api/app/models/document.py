@@ -12,7 +12,7 @@ from app.core.utils import generate_uuid
 class Document(Base):
     __tablename__ = "documents"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=generate_uuid())
+    id = Column(UUID(as_uuid=True), primary_key=True, default=generate_uuid)
     original_filename = Column(String, nullable=False)
     content_type = Column(String, nullable=False)
     storage_provider = Column(String, nullable=False)

@@ -14,45 +14,54 @@ router = APIRouter()
 
 
 @router.post(path="/upload")
-async def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_document(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
     if not file.filename:
-        logger.error("Invalid file")
         raise HTTPException(status_code=400, detail="Invalid file")
 
-    logger.info("Uploading file to S3")
+    try:
+        logger.info("Uploading file to storage")
+        s3_metadata = await upload_file_to_s3(file)
 
-    s3_metadata = await upload_file_to_s3(file)
+        logger.info("Creating document in database")
 
-    logger.info("Successfully uploaded file to S3")
-    logger.debug("S3 Metadata: %s", s3_metadata)
-    logger.info("Creating document in database")
+        document = create_document(
+            db=db,
+            original_filename=s3_metadata["original_name"],
+            content_type=s3_metadata["content_type"],
+            storage_provider="AWS",
+            storage_bucket=s3_metadata["bucket"],
+            storage_key=s3_metadata["key"],
+            status_id=DocumentStatus.QUEUED,
+        )
 
-    document = create_document(
-        db=db,
-        original_filename=s3_metadata.get("original_name"),
-        content_type=s3_metadata.get("content_type"),
-        storage_provider="AWS",
-        storage_bucket=s3_metadata.get("bucket"),
-        storage_key=s3_metadata.get("key"),
-    )
+        db.commit()  # 🔴 VERY IMPORTANT
 
-    logger.info("Publishing message to RabbitMQ")
+        logger.info("Publishing message to RabbitMQ")
+        await publish_message({
+            "document_id": str(document.id),
+        })
 
-    publish_message({
-        "document_id": str(document.id),
-    })
+        return {
+            "status": "queued",
+            "document_id": document.id,
+        }
 
-    logger.info("Message published to RabbitMQ")
-    logger.info("Updating document status to QUEUED")
+    except Exception as e:
+        logger.exception("Upload failed")
 
-    update_document_status(
-        db=db,
-        document_id=document.id,
-        status_id=DocumentStatus.QUEUED,
-    )
+        # Optional but GOOD practice
+        if "document" in locals():
+            update_document_status(
+                db=db,
+                document_id=document.id,
+                status_id=DocumentStatus.FAILED,
+            )
+            db.commit()
 
-    return {
-        "status": "uploaded",
-        "s3_bucket": s3_metadata["bucket"],
-        "s3_key": s3_metadata["key"],
-    }
+        raise HTTPException(
+            status_code=500,
+            detail="Document upload failed"
+        )

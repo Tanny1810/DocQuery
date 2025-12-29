@@ -1,19 +1,27 @@
-import boto3
 from pathlib import Path
-from app.config import settings
+import tempfile
+
+from app.services.storage_providers.aws import download_from_s3
+# later:
+# from app.services.storage_providers.gcs import download_from_gcs
+# from app.services.storage_providers.azure import download_from_azure
 
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=settings.CLOUD_CONFIG.AWS_TE_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.CLOUD_CONFIG.AWS_TE_SECRET_ACCESS_KEY,
-    region_name=settings.CLOUD_CONFIG.AWS_REGION,
-)
+def download_file(*, provider: str, bucket: str, key: str) -> Path:
+    """
+    Download a file from object storage and return local file path.
+    """
 
+    tmp_dir = Path(tempfile.mkdtemp(prefix="docquery_"))
+    local_path = tmp_dir / Path(key).name
 
-def download_file_from_s3(bucket: str, key: str) -> Path:
-    local_path = Path("/tmp") / key.replace("/", "_")
-    local_path.parent.mkdir(parents=True, exist_ok=True)
+    if provider == "AWS":
+        download_from_s3(
+            bucket=bucket,
+            key=key,
+            destination=local_path,
+        )
+    else:
+        raise ValueError(f"Unsupported storage provider: {provider}")
 
-    s3_client.download_file(bucket, key, str(local_path))
     return local_path

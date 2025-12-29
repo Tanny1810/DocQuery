@@ -1,6 +1,7 @@
 numpy<2
 aio-pika==9.4.0
 boto3==1.34.162
+psycopg2-binary==2.9.9
 pydantic
 pydantic-settings==2.4.0
 pypdf==4.2.0

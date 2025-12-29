@@ -10,6 +10,7 @@ def create_document(
     storage_provider: str,
     storage_bucket: str,
     storage_key: str,
+    status_id: int,
 ) -> Document:
     document = Document(
         original_filename=original_filename,
@@ -17,11 +18,11 @@ def create_document(
         storage_provider=storage_provider,
         storage_bucket=storage_bucket,
         storage_key=storage_key,
-        status_id=DocumentStatus.UPLOADED,
+        status_id=status_id,
     )
 
     db.add(document)
-    db.commit()
+    db.flush()
     db.refresh(document)
     return document
 
@@ -34,4 +35,4 @@ def update_document_status(
     db.query(Document).filter(
         Document.id == document_id
     ).update({"status_id": status_id})
-    db.commit()
+    db.flush()
