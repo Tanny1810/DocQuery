@@ -1,8 +1,7 @@
-from sqlalchemy import Column, String, TIMESTAMP, SmallInteger, ForeignKey
+from sqlalchemy import Column, String, TIMESTAMP, SmallInteger, ForeignKey, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-# import uuid
 
 from app.models.base import Base
 from app.core.utils import generate_uuid
@@ -24,6 +23,8 @@ class Document(Base):
         nullable=False,
     )
     created_at = Column(TIMESTAMP, server_default=func.now())
-
+    retry_count = Column(Integer, nullable=True, default=0)
+    max_retries = Column(Integer, nullable=True, default=3)
+    last_error = Column(Text, nullable=True)
     status = relationship("DocumentStatus")
 

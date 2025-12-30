@@ -6,6 +6,9 @@ from app.db.vector_store import store_embeddings, get_vector_count
 from app.db.document_repo import (
     update_document_status,
     get_document_storage_info,
+    get_document_for_update,
+    increment_retry_or_fail,
+    insert_chunks,
 )
 from app.constants.document_status import DocumentStatus
 from shared.config.logging import get_logger
@@ -18,11 +21,35 @@ async def process_document(payload: dict):
 
     logger.info(f"📄 Processing document {document_id}")
 
-    update_document_status(document_id, DocumentStatus.PROCESSING)
+    doc = get_document_for_update(document_id)
+
+    # Re-check status after lock
+    if doc["status_id"] != DocumentStatus.QUEUED:
+        logger.info(
+            f"Document {document_id} already in queue, "
+            f"status={doc['status_id']}"
+        )
+        return
+
+    # Idempotent exit for terminal states
+    if doc["status_id"] in (
+        DocumentStatus.READY,
+        DocumentStatus.FAILED,
+        DocumentStatus.CANCELLED,
+        DocumentStatus.DELETED,
+    ):
+        logger.info(
+            f"⏭️ Skipping document {document_id}, "
+            f"status={doc['status_id']}"
+        )
+        return
+
 
     file_path = None
 
     try:
+        # 0️⃣ Mark PROCESSING
+        update_document_status(document_id, DocumentStatus.PROCESSING)
         # 1️⃣ Fetch storage info from DB (SOURCE OF TRUTH)
         storage = get_document_storage_info(document_id)
 
@@ -46,10 +73,17 @@ async def process_document(payload: dict):
         embeddings = embed_chunks(chunks)
 
         # 6️⃣ Store embeddings
-        store_embeddings(embeddings)
+        vector_ids = store_embeddings(embeddings)
 
         logger.info(f"✅ Stored {len(embeddings)} embeddings")
         logger.info(f"📊 Total vectors in FAISS: {get_vector_count()}")
+
+        insert_chunks(
+            document_id=document_id,
+            chunks=chunks,
+            vector_ids=vector_ids,
+        )
+        logger.info(f"✅ Stored {len(chunks)} chunks")
 
         # 7️⃣ Mark READY
         update_document_status(document_id, DocumentStatus.READY)
@@ -58,13 +92,14 @@ async def process_document(payload: dict):
         logger.exception(
             f"❌ Failed processing document {document_id}: {exc}"
         )
-        update_document_status(document_id, DocumentStatus.RETRYING)
-        raise
+        increment_retry_or_fail(document_id, exc)
+        return
 
     finally:
         # 8️⃣ Cleanup temp file
         if file_path:
             try:
+                logger.info(f"🧹 Cleaning up temp file {file_path}")
                 file_path.unlink(missing_ok=True)
             except Exception:
                 logger.warning(

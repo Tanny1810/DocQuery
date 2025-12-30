@@ -22,7 +22,7 @@ def create_document(
     )
 
     db.add(document)
-    db.flush()
+    db.commit()
     db.refresh(document)
     return document
 
@@ -35,4 +35,4 @@ def update_document_status(
     db.query(Document).filter(
         Document.id == document_id
     ).update({"status_id": status_id})
-    db.flush()
+    db.commit()

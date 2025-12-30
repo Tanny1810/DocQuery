@@ -37,8 +37,6 @@ async def upload_document(
             status_id=DocumentStatus.QUEUED,
         )
 
-        db.commit()  # 🔴 VERY IMPORTANT
-
         logger.info("Publishing message to RabbitMQ")
         await publish_message({
             "document_id": str(document.id),
@@ -59,7 +57,6 @@ async def upload_document(
                 document_id=document.id,
                 status_id=DocumentStatus.FAILED,
             )
-            db.commit()
 
         raise HTTPException(
             status_code=500,
