@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 # Constants
 # -----------------------------
 
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 OPENAI_MODEL = "gpt-4o-mini"
 
 # -----------------------------
