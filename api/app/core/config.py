@@ -29,6 +29,14 @@ class DBConfig(BaseSettings):
     POSTGRES_SCHEMA: str = "public"
 
 
+class LLMConfig(BaseSettings):
+    LLM_PROVIDER: str = "gemini"  # gemini | openai
+    USE_MOCK_LLM: bool = True
+
+    GEMINI_API_KEY: str | None = None
+    OPENAI_API_KEY: str | None = None
+
+
 class Settings(BaseSettings):
     APP_NAME: str = "DocQuery Application"
     APP_PORT: int = 8000
@@ -39,6 +47,7 @@ class Settings(BaseSettings):
     CLOUD_CONFIG: Optional[CloudConfig] = None
     QUEUE_CONFIG: Optional[QueueConfig] = None
     DB_CONFIG: Optional[DBConfig] = None
+    LLM_CONFIG: Optional[LLMConfig] = None
 
     @model_validator(mode="after")
     def build_nested_configs(self):
@@ -48,6 +57,8 @@ class Settings(BaseSettings):
             self.QUEUE_CONFIG = QueueConfig()
         if self.DB_CONFIG is None:
             self.DB_CONFIG = DBConfig()
+        if self.LLM_CONFIG is None:
+            self.LLM_CONFIG = LLMConfig()
         return self
 
     class Config:

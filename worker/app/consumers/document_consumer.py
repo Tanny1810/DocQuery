@@ -2,19 +2,10 @@ import asyncio
 import json
 from aio_pika import connect_robust, IncomingMessage
 from app.services.document_processor import process_document
-from app.core.config import settings
+from shared.messaging.rabbit_mq import get_rabbitmq_url
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
-
-
-def get_rabbitmq_url() -> str:
-    host = settings.QUEUE_CONFIG.RABBITMQ_HOST
-    user = settings.QUEUE_CONFIG.RABBITMQ_USER
-    password = settings.QUEUE_CONFIG.RABBITMQ_PASSWORD
-    port = settings.QUEUE_CONFIG.RABBITMQ_PORT
-
-    return f"amqp://{user}:{password}@{host}:{port}/"
 
 
 async def handle_message(message: IncomingMessage):

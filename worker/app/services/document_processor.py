@@ -1,7 +1,7 @@
 from app.services.storage_service import download_file
 from app.processors.text_extractor import extract_text
 from app.processors.chunker import chunk_text
-from app.processors.embedder import embed_chunks
+from shared.embeddings.embedder import embed_chunks
 from app.db.vector_store import store_embeddings, get_vector_count
 from app.db.document_repo import (
     update_document_status,

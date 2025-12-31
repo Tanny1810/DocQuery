@@ -1,9 +1,10 @@
-numpy<2
 aio-pika==9.4.0
 boto3==1.34.162
+faiss-cpu==1.8.0
+numpy<2
 psycopg2-binary==2.9.9
 pydantic
 pydantic-settings==2.4.0
 pypdf==4.2.0
 sentence-transformers==2.7.0
-faiss-cpu==1.8.0
+tiktoken

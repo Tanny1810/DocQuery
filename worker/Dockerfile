@@ -6,6 +6,8 @@ FROM python:3.11-slim
 # Prevent Python from writing .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV HF_HOME=/app/.hf_cache
+ENV TRANSFORMERS_CACHE=/app/.hf_cache
 
 # Set work directory
 WORKDIR /worker

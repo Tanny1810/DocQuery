@@ -13,6 +13,7 @@ services:
     volumes:
       - ./api:/app/api
       - ./shared:/app/shared
+      - faiss_data:/data/faiss
     depends_on:
       queue:
         condition: service_healthy
@@ -35,6 +36,8 @@ services:
     container_name: docquery-worker
     env_file:
       - .env
+    volumes:
+      - faiss_data:/data/faiss
     depends_on:
       queue:
         condition: service_healthy
@@ -86,6 +89,7 @@ services:
 
 volumes:
   pgdata:
+  faiss_data:
 
 networks:
   docquery-network:

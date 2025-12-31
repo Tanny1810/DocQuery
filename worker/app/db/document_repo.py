@@ -133,3 +133,38 @@ def increment_retry_count(document_id):
     conn.commit()
     cur.close()
     conn.close()
+
+
+def get_chunks_for_rag(vector_ids: list[int]):
+    """
+    Validate FAISS results against Postgres.
+    Only READY / PARTIAL documents are allowed.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+            c.document_id,
+            c.chunk_index,
+            c.content,
+            c.vector_id,
+            d.status_id
+        FROM chunks c
+        JOIN documents d ON d.id = c.document_id
+        WHERE c.vector_id = ANY(%s)
+          AND d.status_id IN (%s, %s)
+        """,
+        (
+            vector_ids,
+            DocumentStatus.READY,
+            DocumentStatus.PARTIAL,
+        ),
+    )
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return rows

@@ -1,12 +1,16 @@
-# API requirements
-
 aio-pika
 alembic==1.13.2
 boto3
+faiss-cpu==1.8.0
 fastapi
+numpy<2
+google-genai
+openai>=1.0.0
 psycopg2-binary==2.9.9
 pydantic
 pydantic-settings
 python-multipart
+sentence-transformers
 sqlalchemy==2.0.30
+tiktoken
 uvicorn
