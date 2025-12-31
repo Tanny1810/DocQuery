@@ -65,7 +65,8 @@ def get_document_for_update(document_id):
             storage_provider,
             storage_bucket,
             storage_key,
-            retry_count
+            retry_count,
+            max_retries
         FROM documents
         WHERE id = %s
         FOR UPDATE
@@ -90,37 +91,6 @@ def get_document_for_update(document_id):
 
     return row
 
-def increment_retry_or_fail(document_id, exc: Exception):
-    """
-    Increment retry count.
-    If max retries exceeded, mark document as FAILED.
-    """
-    conn = get_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        """
-        UPDATE documents
-        SET
-            retry_count = retry_count + 1,
-            status_id = CASE
-                WHEN retry_count + 1 >= %s THEN %s
-                ELSE %s
-            END
-        WHERE id = %s
-        """,
-        (
-            MAX_RETRIES,
-            DocumentStatus.FAILED,
-            DocumentStatus.RETRYING,
-            str(document_id),
-        ),
-    )
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
 def insert_chunks(document_id, chunks, vector_ids):
     conn = get_connection()
     cur = conn.cursor()
@@ -137,6 +107,23 @@ def insert_chunks(document_id, chunks, vector_ids):
     """
 
     execute_values(cur, query, values)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def increment_retry_count(document_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        UPDATE documents
+        SET retry_count = retry_count + 1
+        WHERE id = %s
+        """,
+        (str(document_id),),
+    )
 
     conn.commit()
     cur.close()

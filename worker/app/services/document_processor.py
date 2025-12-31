@@ -7,9 +7,9 @@ from app.db.document_repo import (
     update_document_status,
     get_document_storage_info,
     get_document_for_update,
-    increment_retry_or_fail,
     insert_chunks,
 )
+from app.services.document_retry_service import increment_retry_or_fail
 from app.constants.document_status import DocumentStatus
 from shared.config.logging import get_logger
 
@@ -23,27 +23,12 @@ async def process_document(payload: dict):
 
     doc = get_document_for_update(document_id)
 
-    # Re-check status after lock
     if doc["status_id"] != DocumentStatus.QUEUED:
-        logger.info(
-            f"Document {document_id} already in queue, "
-            f"status={doc['status_id']}"
-        )
-        return
-
-    # Idempotent exit for terminal states
-    if doc["status_id"] in (
-        DocumentStatus.READY,
-        DocumentStatus.FAILED,
-        DocumentStatus.CANCELLED,
-        DocumentStatus.DELETED,
-    ):
         logger.info(
             f"⏭️ Skipping document {document_id}, "
             f"status={doc['status_id']}"
         )
         return
-
 
     file_path = None
 
