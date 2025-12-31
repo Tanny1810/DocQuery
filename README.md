@@ -37,44 +37,46 @@ DocQuery solves this by:
 
 ## 🏗️ Clean Architecture Overview
 
-            ┌──────────────┐
-            │    Client    │
-            │ (UI / API)   │
-            └──────┬───────┘
-                │ HTTP
-                ▼
-            ┌────────────────────────┐
-            │     FastAPI API         │
-            │────────────────────────│
-            │ • Request validation   │
-            │ • Metadata storage     │
-            │ • Upload to S3         │
-            │ • Publish task         │
-            └──────┬─────────┬───────┘
-                │         │
-                │         └──────────┐
-                ▼                    ▼
-            ┌──────────────┐     ┌──────────────┐
-            │ PostgreSQL   │     │   RabbitMQ   │
-            │ (Metadata)  │     │ (Task Queue) │
-            └──────────────┘     └──────┬───────┘
-                                        │
-                                        ▼
-                                ┌──────────────────┐
-                                │ Background Worker │
-                                │──────────────────│
-                                │ • Download file  │
-                                │ • Extract text   │
-                                │ • Chunk text     │
-                                │ • Embed chunks   │
-                                │ • Store vectors  │
-                                └──────┬───────────┘
-                                    │
-                                    ▼
-                                ┌──────────────┐
-                                │  Vector DB   │
-                                │ (FAISS etc.) │
-                                └──────────────┘
+                            ┌──────────────┐
+                            │    Client    │
+                            │ (UI / API)   │
+                            └──────┬───────┘
+                                │
+                                HTTP
+                                │
+                                ▼
+                            ┌────────────────────────┐
+                            │     FastAPI API        │
+                            │────────────────────────│
+                            │ • Request validation   │
+                            │ • Metadata storage     │
+                            │ • Upload to S3         │
+                            │ • Publish task         │
+                            └──────┬─────────┬───────┘
+                                │         │
+                                │         └──────────┐
+                                ▼                    ▼
+                            ┌──────────────┐     ┌──────────────┐
+                            │ PostgreSQL   │     │   RabbitMQ   │
+                            │ (Metadata)   │     │ (Task Queue) │
+                            └──────────────┘     └──────┬───────┘
+                                                        │
+                                                        ▼
+                                                ┌──────────────────┐
+                                                │ Background Worker│
+                                                │──────────────────│
+                                                │ • Download file  │
+                                                │ • Extract text   │
+                                                │ • Chunk text     │
+                                                │ • Embed chunks   │
+                                                │ • Store vectors  │
+                                                └──────┬───────────┘
+                                                    │
+                                                    ▼
+                                                ┌──────────────┐
+                                                │  Vector DB   │
+                                                │ (FAISS etc.) │
+                                                └──────────────┘
 
 ### High-Level Flow
 1. Client uploads a document
@@ -123,19 +125,19 @@ sequenceDiagram
 
 ## 🧠 RAG Processing Flow
 
-            User Query
-                │
-                ▼
-            FastAPI API
-                │
-                ▼
-            Vector Search (Top-K chunks)
-                │
-                ▼
-            LLM (Context + Question)
-                │
-                ▼
-            Final Answer
+                            User Query
+                                │
+                                ▼
+                            FastAPI API
+                                │
+                                ▼
+                            Vector Search (Top-K chunks)
+                                │
+                                ▼
+                            LLM (Context + Question)
+                                │
+                                ▼
+                            Final Answer
 
 ---
 
@@ -168,31 +170,39 @@ sequenceDiagram
 ```text
 docquery/
 ├── api/
+│   ├── alembic/          # Database migrations
 │   ├── app/
+│   │   ├── constants/    # Constants
 │   │   ├── core/         # Core components (settings, middleware)
 │   │   ├── db/           # Database repositories and session
 │   │   ├── models/       # SQLAlchemy ORM models
 │   │   ├── routers/      # API endpoints (v1)
+│   │   ├── schemas/      # Pydantic models
 │   │   ├── services/     # Business logic
 │   │   └── main.py       # FastAPI application entrypoint
-│   ├── alembic/          # Database migrations
-│   └── Dockerfile
+│   ├── alembic.ini       # Alembic configuration
+│   └── Dockerfile        # FastAPI application Dockerfile
 │
-├── worker/
-│   ├── app/
-│   │   ├── consumers/    # RabbitMQ message consumers
-│   │   ├── processors/   # Text extraction, chunking, embedding
-│   │   └── main.py       # Worker application entrypoint
-│   └── Dockerfile
-│
+├── data/                 # Sample data for testing
 ├── shared/
 │   ├── config/           # Shared logging and settings
 │   ├── embeddings/       # AI model and embedding utilities
+│   ├── messaging/        # RabbitMQ client and connection
 │   ├── storage/          # Cloud storage clients
 │   └── utils/            # Common utilities
 │
-├── data/                   # Sample data for testing
-├── docker-compose.yml
+├── worker/
+│   ├── app/
+│   │   ├── constants/    # Constants
+│   │   ├── consumers/    # RabbitMQ message consumers
+│   │   ├── core/         # Core components (settings, middleware)
+│   │   ├── db/           # Database repositories
+│   │   ├── processors/   # Text extraction, chunking, embedding
+│   │   ├── services/     # Service logic
+│   │   └── main.py       # Worker application entrypoint
+│   └── Dockerfile        # Worker Dockerfile
+│
+├── docker-compose.yml.   # Docker Compose configuration
 └── README.md
 ```
 
