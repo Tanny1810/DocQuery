@@ -50,6 +50,4 @@ def increment_retry_or_fail(document_id, exc: Exception):
             queue=DLQ_QUEUE,
         )
 
-        logger.error(
-            f"☠️ Document {document_id} sent to DLQ"
-        )
+        logger.error(f"☠️ Document {document_id} sent to DLQ")

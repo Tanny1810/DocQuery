@@ -17,6 +17,4 @@ class Chunk(Base):
     content = Column(Text, nullable=False)
     vector_id = Column(Integer, nullable=False)
 
-    __table_args__ = (
-        UniqueConstraint("document_id", "chunk_index"),
-    )
+    __table_args__ = (UniqueConstraint("document_id", "chunk_index"),)

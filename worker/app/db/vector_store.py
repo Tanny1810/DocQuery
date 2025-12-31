@@ -14,10 +14,11 @@ else:
 
 def store_embeddings(embeddings: list[list[float]]):
     vectors = np.array(embeddings).astype("float32")
-    start_index = index.ntotal 
+    start_index = index.ntotal
     index.add(vectors)
     faiss.write_index(index, str(INDEX_PATH))
     return [start_index + i for i in range(len(embeddings))]
+
 
 def get_vector_count() -> int:
     return index.ntotal

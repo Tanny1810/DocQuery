@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 from pydantic import model_validator
 from typing import Optional
 
+
 class CloudConfig(BaseSettings):
     # AWS_ACCESS_KEY_ID: str = ""
     AWS_TE_ACCESS_KEY_ID: str = ""
@@ -10,12 +11,14 @@ class CloudConfig(BaseSettings):
     AWS_REGION: str = ""
     S3_BUCKET_NAME: str = ""
 
+
 class QueueConfig(BaseSettings):
     RABBITMQ_USER: str = ""
     RABBITMQ_PASSWORD: str = ""
     RABBITMQ_HOST: str = ""
     RABBITMQ_PORT: int = 5672
     QUEUE_NAME: str = ""
+
 
 class DBConfig(BaseSettings):
     POSTGRES_HOST: str = ""
@@ -24,6 +27,7 @@ class DBConfig(BaseSettings):
     POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = ""
     POSTGRES_SCHEMA: str = "public"
+
 
 class Settings(BaseSettings):
     APP_NAME: str = "DocQuery Application"
@@ -36,7 +40,7 @@ class Settings(BaseSettings):
     QUEUE_CONFIG: Optional[QueueConfig] = None
     DB_CONFIG: Optional[DBConfig] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def build_nested_configs(self):
         if self.CLOUD_CONFIG is None:
             self.CLOUD_CONFIG = CloudConfig()

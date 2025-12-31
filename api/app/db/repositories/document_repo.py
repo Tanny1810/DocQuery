@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models import Document
 from app.constants.document_status import DocumentStatus
 
+
 def create_document(
     db: Session,
     *,
@@ -26,13 +27,14 @@ def create_document(
     db.refresh(document)
     return document
 
+
 def update_document_status(
     db: Session,
     *,
     document_id,
     status_id: int,
 ):
-    db.query(Document).filter(
-        Document.id == document_id
-    ).update({"status_id": status_id})
+    db.query(Document).filter(Document.id == document_id).update(
+        {"status_id": status_id}
+    )
     db.commit()

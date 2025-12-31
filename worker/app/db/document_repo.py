@@ -4,6 +4,7 @@ from psycopg2.extras import execute_values
 
 MAX_RETRIES = 3
 
+
 def update_document_status(document_id, status_id):
     conn = get_connection()
     cur = conn.cursor()
@@ -18,6 +19,7 @@ def update_document_status(document_id, status_id):
     conn.commit()
     cur.close()
     conn.close()
+
 
 def get_document_storage_info(document_id):
     conn = get_connection()
@@ -48,6 +50,7 @@ def get_document_storage_info(document_id):
         "storage_bucket": row["storage_bucket"],
         "storage_key": row["storage_key"],
     }
+
 
 def get_document_for_update(document_id):
     """
@@ -91,6 +94,7 @@ def get_document_for_update(document_id):
 
     return row
 
+
 def insert_chunks(document_id, chunks, vector_ids):
     conn = get_connection()
     cur = conn.cursor()
@@ -111,6 +115,7 @@ def insert_chunks(document_id, chunks, vector_ids):
     conn.commit()
     cur.close()
     conn.close()
+
 
 def increment_retry_count(document_id):
     conn = get_connection()

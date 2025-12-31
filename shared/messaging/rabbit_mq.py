@@ -6,14 +6,16 @@ from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
 
+
 def get_rabbitmq_url() -> str:
     """Get RabbitMQ URL, using service name in Docker, localhost otherwise"""
     host = settings.QUEUE_CONFIG.RABBITMQ_HOST
     user = quote_plus(settings.QUEUE_CONFIG.RABBITMQ_USER)
     password = quote_plus(settings.QUEUE_CONFIG.RABBITMQ_PASSWORD)
     port = settings.QUEUE_CONFIG.RABBITMQ_PORT
-    
+
     return f"amqp://{user}:{password}@{host}:{port}/"
+
 
 RABBITMQ_URL = get_rabbitmq_url()
 

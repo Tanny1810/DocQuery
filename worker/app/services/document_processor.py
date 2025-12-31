@@ -24,10 +24,7 @@ async def process_document(payload: dict):
     doc = get_document_for_update(document_id)
 
     if doc["status_id"] != DocumentStatus.QUEUED:
-        logger.info(
-            f"⏭️ Skipping document {document_id}, "
-            f"status={doc['status_id']}"
-        )
+        logger.info(f"⏭️ Skipping document {document_id}, " f"status={doc['status_id']}")
         return
 
     file_path = None
@@ -74,9 +71,7 @@ async def process_document(payload: dict):
         update_document_status(document_id, DocumentStatus.READY)
 
     except Exception as exc:
-        logger.exception(
-            f"❌ Failed processing document {document_id}: {exc}"
-        )
+        logger.exception(f"❌ Failed processing document {document_id}: {exc}")
         increment_retry_or_fail(document_id, exc)
         return
 
@@ -87,6 +82,4 @@ async def process_document(payload: dict):
                 logger.info(f"🧹 Cleaning up temp file {file_path}")
                 file_path.unlink(missing_ok=True)
             except Exception:
-                logger.warning(
-                    f"⚠️ Failed to cleanup temp file {file_path}"
-                )
+                logger.warning(f"⚠️ Failed to cleanup temp file {file_path}")

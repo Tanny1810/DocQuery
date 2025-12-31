@@ -1,5 +1,6 @@
 from enum import IntEnum
 
+
 class DocumentStatus(IntEnum):
     UPLOADED = 1
     QUEUED = 2

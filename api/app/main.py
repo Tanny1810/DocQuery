@@ -12,10 +12,7 @@ def create_app() -> FastAPI:
     # configure global logging early
     configure_logging(settings.LOG_LEVEL)
 
-    app = FastAPI(
-        title=settings.APP_NAME,
-        debug=settings.DEBUG
-    )
+    app = FastAPI(title=settings.APP_NAME, debug=settings.DEBUG)
 
     # register middleware that sets X-Request-Id and logs
     app.add_middleware(RequestIdMiddleware)

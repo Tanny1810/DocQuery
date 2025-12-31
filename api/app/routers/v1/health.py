@@ -6,6 +6,4 @@ router = APIRouter()
 
 @router.get(path="", response_model=HealthResponse)
 async def health_check():
-    return HealthResponse(
-        status="healthy"
-    )
+    return HealthResponse(status="healthy")
