@@ -2,7 +2,7 @@ import asyncio
 import json
 from aio_pika import connect_robust, IncomingMessage
 from app.services.document_processor import process_document
-from app.config import settings
+from app.core.config import settings
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)

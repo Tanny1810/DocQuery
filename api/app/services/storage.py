@@ -1,6 +1,6 @@
 import boto3
 from fastapi import UploadFile
-from api.app.core.config import settings
+from app.core.config import settings
 from api.app.core.utils import generate_uuid
 
 

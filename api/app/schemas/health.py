@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Literal
-from api.app.core.config import settings
+from app.core.config import settings
 
 
 class HealthResponse(BaseModel):

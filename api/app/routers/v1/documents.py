@@ -1,10 +1,13 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
 from api.app.services.storage import upload_file_to_s3
-from api.app.core.rabbit_mq import publish_message
 from api.app.constants.document_status import DocumentStatus
-from api.app.db.repositories.document_repo import create_document, update_document_status
+from api.app.db.repositories.document_repo import (
+    create_document,
+    update_document_status,
+)
 from api.app.db.session import get_db
+from shared.messaging.rabbit_mq import publish_message
 from shared.config.logging import get_logger
 
 
@@ -14,10 +17,7 @@ router = APIRouter()
 
 
 @router.post(path="/upload")
-async def upload_document(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
+async def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid file")
 
@@ -38,9 +38,11 @@ async def upload_document(
         )
 
         logger.info("Publishing message to RabbitMQ")
-        await publish_message({
-            "document_id": str(document.id),
-        })
+        await publish_message(
+            {
+                "document_id": str(document.id),
+            }
+        )
 
         return {
             "status": "queued",
@@ -58,7 +60,4 @@ async def upload_document(
                 status_id=DocumentStatus.FAILED,
             )
 
-        raise HTTPException(
-            status_code=500,
-            detail="Document upload failed"
-        )
+        raise HTTPException(status_code=500, detail="Document upload failed")

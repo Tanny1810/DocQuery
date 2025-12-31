@@ -1,7 +1,7 @@
 # FastAPI main application
 
 from fastapi import FastAPI
-from api.app.core.config import settings
+from app.core.config import settings
 from api.app.routers.router import router_v1
 
 from shared.config.logging import configure_logging

@@ -3,7 +3,7 @@
 import asyncio
 from shared.config.logging import configure_logging
 from app.consumers.document_consumer import start_document_consumer
-from app.config import settings
+from app.core.config import settings
 
 
 if __name__ == "__main__":

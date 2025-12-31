@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from app.config import settings
+from app.core.config import settings
 
 def get_connection():
     return psycopg2.connect(
