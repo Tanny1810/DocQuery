@@ -1,4 +1,7 @@
 from app.core.config import settings
+from shared.config.logging import get_logger
+
+logger = get_logger(__name__)
 
 # -----------------------------
 # Constants
@@ -71,31 +74,46 @@ def call_llm(prompt: str) -> str:
 
 
 def _call_gemini(prompt: str) -> str:
+    from google.genai import types
+    from google.api_core import exceptions as google_exceptions
+
     client = _get_gemini_client()
-
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt,
-        generation_config={
-            "temperature": 0.2,
-            "max_output_tokens": 512,
-        },
-    )
-
-    return response.text.strip()
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                max_output_tokens=512,
+            ),
+        )
+        return response.text.strip()
+    except ValueError:
+        logger.warning("Gemini response was blocked or did not contain text.")
+        return ""
+    except google_exceptions.GoogleAPIError as e:
+        logger.error(f"Gemini API call failed: {e}")
+        raise RuntimeError("LLM service failed to generate a response.") from e
 
 
 def _call_openai(prompt: str) -> str:
+    from openai import APIError as OpenAIAPIError
+
     client = _get_openai_client()
-
-    response = client.chat.completions.create(
-        model=OPENAI_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=512,
-    )
-
-    return response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2,
+            max_tokens=512,
+        )
+        if response.choices:
+            return response.choices[0].message.content.strip()
+        logger.warning("OpenAI response did not contain any choices.")
+        return ""
+    except OpenAIAPIError as e:
+        logger.error(f"OpenAI API call failed: {e}")
+        raise RuntimeError("LLM service failed to generate a response.") from e
 
 
 # -----------------------------

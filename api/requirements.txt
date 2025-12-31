@@ -4,6 +4,7 @@ boto3
 faiss-cpu==1.8.0
 fastapi
 numpy<2
+google-api-core
 google-genai
 openai>=1.0.0
 psycopg2-binary==2.9.9
