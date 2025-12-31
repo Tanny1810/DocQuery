@@ -238,6 +238,24 @@ stateDiagram-v2
 -   `CANCELLED`: A user or an automated process cancelled the processing task before completion.
 -   `DELETED`: The document and all its associated data have been permanently deleted from the system.
 
+The `document_statuses` table acts as a lookup for document lifecycle states. After the database is running, you can seed it with the necessary statuses by running the following command:
+
+```bash
+docker exec -i docquery-postgres psql -U ADD-USER -d ADD-DB <<EOF
+INSERT INTO document_statuses (id, name, description) VALUES
+  (1, 'UPLOADED',   'Document metadata stored and file uploaded'),
+  (2, 'QUEUED',     'Message published to queue, awaiting worker'),
+  (3, 'PROCESSING', 'Worker is processing the document'),
+  (4, 'RETRYING',   'Processing failed temporarily, retrying'),
+  (5, 'PARTIAL',    'Some chunks processed successfully'),
+  (6, 'READY',      'Document fully processed and queryable'),
+  (7, 'CANCELLED',  'Processing was cancelled by user or system'),
+  (8, 'FAILED',     'Processing failed permanently'),
+  (9, 'DELETED',    'Document was logically deleted')
+ON CONFLICT (id) DO NOTHING;
+EOF
+```
+
 ---
 
 ## ⚙️ Local Development Setup
