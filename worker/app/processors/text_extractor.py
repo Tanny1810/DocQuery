@@ -27,3 +27,9 @@ def _extract_pdf(file_path: Path) -> str:
 
 def _extract_txt(file_path: Path) -> str:
     return file_path.read_text(encoding="utf-8")
+
+
+def clean_text(text: str) -> str:
+    if not text:
+        return text
+    return text.replace("\x00", "")

@@ -1,5 +1,5 @@
 from app.services.storage_service import download_file
-from app.processors.text_extractor import extract_text
+from app.processors.text_extractor import extract_text, clean_text
 from app.processors.chunker import chunk_text
 from shared.embeddings.embedder import embed_chunks
 from app.db.vector_store import store_embeddings, get_vector_count
@@ -44,6 +44,9 @@ async def process_document(payload: dict):
 
         # 3️⃣ Extract text
         text = extract_text(file_path)
+
+        # 🔧 CLEAN HERE
+        text = clean_text(text)
 
         # 4️⃣ Chunk text
         chunks = chunk_text(text)

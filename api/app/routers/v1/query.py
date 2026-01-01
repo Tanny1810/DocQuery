@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-@router.post("/query")
+@router.post("/search")
 def query_docs(payload: QueryRequest, db: Session = Depends(get_db)):
     return query_documents(
         db=db,
