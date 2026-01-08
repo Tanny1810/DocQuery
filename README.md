@@ -297,14 +297,99 @@ docker-compose up --build
 
 ---
 
-## 🚧 Future Enhancements
+## 🧭 Project Roadmap
 
-- Authentication and authorization  
-- API rate limiting  
-- Multi-document querying  
-- Streaming LLM responses  
-- Support for multiple vector databases  
-- Frontend UI  
+DocQuery is being developed in **clear, versioned milestones**, with each release building on a stable foundation.  
+The roadmap reflects **planned direction**, not fixed timelines.
+
+---
+
+### ✅ V1 – Core RAG Foundation (Completed)
+
+**Focus:** Reliable ingestion & retrieval pipeline
+
+**Features**
+- Document upload and ingestion  
+- Async processing using background workers  
+- Chunking and embeddings  
+- Vector-based semantic search  
+- Retry handling and DLQ  
+- Explicit document lifecycle management  
+
+**Status:** ✔ Stable
+
+---
+
+### 🚀 V2 – Multi-User & Production-Grade RAG (Planned)
+
+**Focus:** Multi-tenancy, retrieval quality, and performance
+
+**Features**
+- User authentication (JWT-based)  
+- Document ownership and query isolation  
+- Enhanced RAG pipeline:
+  - Hybrid retrieval (vector + keyword)
+  - Smarter chunking (section / slide aware)
+  - Chunk re-ranking
+  - Answer confidence scores
+  - Richer source citations (page / slide)
+- Support for additional document formats:
+  - Improved PDF handling
+  - DOCX
+  - PPTX
+  - TXT / Markdown
+- Migration to a production-ready vector database  
+- Performance optimizations across ingestion and querying  
+
+**Improvements**
+- Stronger data isolation  
+- Higher answer accuracy  
+- Scalable vector storage  
+- Cleaner and more extensible ingestion pipeline  
+
+**Breaking changes**
+- Authentication becomes mandatory for all APIs  
+- All queries are scoped per user  
+
+---
+
+### 🚀 V3 – Platform, Monetization & Multimodal Support (Planned)
+
+**Focus:** SaaS readiness and broader content support
+
+**Features**
+- Usage tracking and quotas  
+- Plan-based limits (free / paid tiers)  
+- API rate limiting and abuse protection  
+- API keys and webhooks  
+- SDK for easier third-party integration  
+- Audio document support (speech-to-text ingestion)  
+- Image document support (OCR-based ingestion)  
+
+**Improvements**
+- Cost-aware system behavior  
+- Better developer experience  
+- Multimodal ingestion using the same RAG pipeline  
+
+**Breaking changes**
+- Requests may fail due to quota or rate limits (policy-level behavior changes)  
+
+---
+
+### 🚀 V4 – Agentic Document Intelligence (Future)
+
+**Focus:** Intelligent, autonomous document workflows
+
+**Planned capabilities**
+- Agent-driven multi-step reasoning  
+- Tool-based document analysis (search, summarize, compare)  
+- Long-running tasks and workflow orchestration  
+- Memory-aware document reasoning  
+- Advanced document comparison and change tracking  
+
+**Notes**
+- This version may introduce new interaction patterns and APIs  
+- Scope will evolve based on platform maturity and user needs  
 
 ---
 
