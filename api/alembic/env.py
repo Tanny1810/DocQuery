@@ -16,13 +16,22 @@ load_dotenv()
 # access to the values within the .ini file in use.
 config = context.config
 
-db_user = os.getenv("POSTGRES_USER")
-db_password = os.getenv("POSTGRES_PASSWORD")
-db_host = os.getenv("POSTGRES_HOST")
-db_port = os.getenv("POSTGRES_PORT")
-db_name = os.getenv("POSTGRES_DB")
+# Prefer a full `DATABASE_URL` if provided (CI sets this). Otherwise
+# construct from POSTGRES_* vars with sensible defaults so env.py is
+# robust when variables are missing.
+env_database_url = os.getenv("DATABASE_URL")
+if env_database_url:
+    database_url = env_database_url
+else:
+    db_user = os.getenv("POSTGRES_USER", "postgres")
+    db_password = os.getenv("POSTGRES_PASSWORD", "postgres")
+    db_host = os.getenv("POSTGRES_HOST", "localhost")
+    db_port = os.getenv("POSTGRES_PORT") or "5432"
+    db_name = os.getenv("POSTGRES_DB", "docquery_test")
 
-database_url = f"postgresql://{db_user}:{db_password}" f"@{db_host}:{db_port}/{db_name}"
+    database_url = (
+        f"postgresql://{db_user}:{db_password}" f"@{db_host}:{db_port}/{db_name}"
+    )
 
 config.set_main_option("sqlalchemy.url", database_url)
 
