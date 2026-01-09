@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Optional
 
 try:
     from shared.utils.request_context import get_request_id

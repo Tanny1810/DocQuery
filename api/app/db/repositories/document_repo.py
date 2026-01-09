@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from app.models import Document
-from app.constants.document_status import DocumentStatus
 
 
 def create_document(

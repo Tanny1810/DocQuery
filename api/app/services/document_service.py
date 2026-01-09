@@ -45,7 +45,7 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(ge
             "document_id": document.id,
         }
 
-    except Exception as e:
+    except Exception:
         logger.exception("Upload failed")
 
         # Optional but GOOD practice

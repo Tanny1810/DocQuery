@@ -1,4 +1,4 @@
-from app.models.base import Base
-from app.models.document import Document
-from app.models.chunk import Chunk
-from app.models.lookup import DocumentStatus
+from app.models.base import Base  # noqa: F401
+from app.models.document import Document  # noqa: F401
+from app.models.chunk import Chunk  # noqa: F401
+from app.models.lookup import DocumentStatus  # noqa: F401

@@ -2,7 +2,7 @@ from uuid import uuid4
 import time
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from shared.utils.request_context import set_request_id, get_request_id
+from shared.utils.request_context import set_request_id
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
