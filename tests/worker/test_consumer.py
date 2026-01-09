@@ -43,6 +43,16 @@ def test_handle_message_calls_process_document():
     fake_rmq.get_rabbitmq_url = get_rabbitmq_url
     sys.modules["shared.messaging.rabbit_mq"] = fake_rmq
 
+    # Provide a minimal fake for shared.config.logging.get_logger
+    fake_logging = types.ModuleType("shared.config.logging")
+    import logging as _logging
+
+    def get_logger(name: str):
+        return _logging.getLogger(name)
+
+    fake_logging.get_logger = get_logger
+    sys.modules["shared.config.logging"] = fake_logging
+
     # Load the consumer module directly from file to avoid package import issues
     base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     path = os.path.join(base, "worker", "app", "consumers", "document_consumer.py")
