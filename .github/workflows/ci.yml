@@ -75,8 +75,8 @@ jobs:
 
       - name: Build API Docker image
         run: |
-          docker build -t docquery-api:ci api/
+          docker build -t docquery-api:ci -f api/Dockerfile .
 
       - name: Build Worker Docker image
         run: |
-          docker build -t docquery-worker:ci worker/
+          docker build -t docquery-worker:ci -f worker/Dockerfile .
