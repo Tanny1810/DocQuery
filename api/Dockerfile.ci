@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy CI-only requirements and install minimal deps to keep image small
+COPY api/requirements-ci.txt ./requirements-ci.txt
+RUN pip install --no-cache-dir -r requirements-ci.txt
+
+# Copy shared and api code
+COPY shared/ /app/shared/
+COPY api/ /app/api/
+
+# Copy entrypoint and make executable
+COPY api/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
