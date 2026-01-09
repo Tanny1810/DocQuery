@@ -1,5 +1,7 @@
 import importlib.util
 import os
+import sys
+import types
 
 
 def _load_builder():
@@ -7,6 +9,17 @@ def _load_builder():
     path = os.path.join(base, "shared", "rag", "prompt_builder.py")
     spec = importlib.util.spec_from_file_location("shared.rag.prompt_builder", path)
     mod = importlib.util.module_from_spec(spec)
+    # Inject a lightweight `tiktoken` stub for tests to avoid needing the real package.
+    if "tiktoken" not in sys.modules:
+        tmod = types.ModuleType("tiktoken")
+
+        def get_encoding(name):
+            enc = types.SimpleNamespace()
+            enc.encode = lambda s: s.split()
+            return enc
+
+        tmod.get_encoding = get_encoding
+        sys.modules["tiktoken"] = tmod
     spec.loader.exec_module(mod)
     return mod
 
