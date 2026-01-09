@@ -302,6 +302,10 @@ docker-compose up --build
 DocQuery is being developed in **clear, versioned milestones**, with each release building on a stable foundation.  
 The roadmap reflects **planned direction**, not fixed timelines.
 
+> **Development & Deployment Strategy**  
+> DocQuery is developed locally using Docker and Docker Compose during early versions.  
+> Cloud deployment (AWS + Kubernetes) is intentionally planned for later stages once the platform reaches sufficient maturity.
+
 ---
 
 ### ✅ V1 – Core RAG Foundation (Completed)
@@ -355,7 +359,7 @@ The roadmap reflects **planned direction**, not fixed timelines.
 
 ### 🚀 V3 – Platform, Monetization & Multimodal Support (Planned)
 
-**Focus:** SaaS readiness and broader content support
+**Focus:** SaaS readiness, scalability, and broader content support
 
 **Features**
 - Usage tracking and quotas  
@@ -366,10 +370,18 @@ The roadmap reflects **planned direction**, not fixed timelines.
 - Audio document support (speech-to-text ingestion)  
 - Image document support (OCR-based ingestion)  
 
+**Infrastructure & Deployment**
+- Kubernetes-based deployment (AWS EKS or equivalent)
+- Container orchestration for API and worker services
+- Horizontal Pod Autoscaling (HPA) for background workers
+- Health checks, rolling updates, and self-healing
+- Environment-based configuration using ConfigMaps and Secrets
+
 **Improvements**
 - Cost-aware system behavior  
 - Better developer experience  
 - Multimodal ingestion using the same RAG pipeline  
+- Improved reliability and scalability under load  
 
 **Breaking changes**
 - Requests may fail due to quota or rate limits (policy-level behavior changes)  
