@@ -1,0 +1,5 @@
+requests
+psycopg2-binary
+aio-pika
+pytest
+python-dotenv

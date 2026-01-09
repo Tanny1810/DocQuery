@@ -5,10 +5,65 @@ on:
   push:
     branches: [ "main" ]
 
-jobs:
-  ci:
-    runs-on: ubuntu-latest
+env:
+  ENV: test
 
+jobs:
+  setup-deps:
+    name: Setup and cache
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements-ci.txt', 'worker/requirements-ci.txt') }}
+
+      - name: Install dependencies and dev tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements-ci.txt
+          pip install ruff pytest
+
+  lint:
+    name: Lint (shared + api + worker)
+    runs-on: ubuntu-latest
+    needs: setup-deps
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run linter
+        run: |
+          ruff check shared api worker
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup-deps
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: |
+          pytest -q -k "not integration"
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: setup-deps
     services:
       postgres:
         image: postgres:15
@@ -32,32 +87,10 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/docquery_test
       RABBITMQ_URL: amqp://guest:guest@localhost:5672/
-      ENV: test
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements.txt', 'worker/requirements.txt') }}
-
-      - name: Install dependencies and dev tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r api/requirements-ci.txt
-          pip install ruff pytest
-
-      - name: Lint (shared + api + worker)
-        run: |
-          ruff check shared api worker
 
       - name: Wait for services
         run: |
@@ -69,14 +102,30 @@ jobs:
           cd api
           alembic upgrade head
 
-      - name: Run tests
+      - name: Run integration tests
         run: |
           pytest -v
 
-      - name: Build API Docker image (CI lightweight)
+  build-api:
+    name: Build API Docker image (CI lightweight)
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build API image
         run: |
           docker build -t docquery-api:ci -f api/Dockerfile.ci .
 
-      - name: Build Worker Docker image
+  build-worker:
+    name: Build Worker Docker image (CI lightweight)
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build Worker image
         run: |
-          docker build -t docquery-worker:ci -f worker/Dockerfile .
+          docker build -t docquery-worker:ci -f worker/Dockerfile.ci .

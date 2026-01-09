@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install CI-only, lightweight dependencies
+COPY worker/requirements-ci.txt ./requirements-ci.txt
+RUN pip install --no-cache-dir -r requirements-ci.txt
+
+# Copy worker app
+COPY shared/ /app/shared/
+COPY worker/app/ /app/worker/app/
+
+CMD ["python", "-m", "worker.app.main"]
