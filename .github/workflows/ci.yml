@@ -44,6 +44,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore pip cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements-ci.txt', 'worker/requirements-ci.txt') }}
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
       - name: Run linter
         run: |
           ruff check shared api worker
@@ -55,6 +71,23 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore pip cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements-ci.txt', 'worker/requirements-ci.txt') }}
+
+      - name: Install test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements-ci.txt
+          pip install pytest pytest-asyncio
 
       - name: Run unit tests
         run: |
@@ -91,6 +124,23 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore pip cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements-ci.txt', 'worker/requirements-ci.txt') }}
+
+      - name: Install integration deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements-ci.txt
+          pip install pytest alembic psycopg2-binary
 
       - name: Wait for services
         run: |
