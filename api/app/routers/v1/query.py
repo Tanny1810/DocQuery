@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.rag_service import query_documents
-from app.schemas.query import QueryRequest
+from app.schemas.v1.query import QueryRequest
 from shared.config.logging import get_logger
 
 
