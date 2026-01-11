@@ -1,4 +1,4 @@
-from app.constants.document_status import DocumentStatus
+from shared.constants.document_status import DocumentStatus
 from app.db.document_repo import (
     get_document_for_update,
     increment_retry_count,

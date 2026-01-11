@@ -7,5 +7,7 @@ from datetime import datetime
 class DocumentType:
     id: str
     filename: str
+    content_type: str
+    storage_provider: str
     status: str
     created_at: datetime

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.chunk import Chunk
 from app.models.document import Document
-from app.constants.document_status import DocumentStatus
+from shared.constants.document_status import DocumentStatus
 
 
 def get_chunks_for_rag(

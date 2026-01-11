@@ -10,7 +10,7 @@ from app.db.document_repo import (
     insert_chunks,
 )
 from app.services.document_retry_service import increment_retry_or_fail
-from app.constants.document_status import DocumentStatus
+from shared.constants.document_status import DocumentStatus
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)

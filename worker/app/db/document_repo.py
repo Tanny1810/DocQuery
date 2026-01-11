@@ -1,5 +1,5 @@
 from app.db.postgres import get_connection
-from app.constants.document_status import DocumentStatus
+from shared.constants.document_status import DocumentStatus
 from psycopg2.extras import execute_values
 
 MAX_RETRIES = 3

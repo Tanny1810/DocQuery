@@ -1,7 +1,7 @@
 from fastapi import UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.services.storage import upload_file_to_s3
-from app.constants.document_status import DocumentStatus
+from shared.constants.document_status import DocumentStatus
 from app.db.repositories.document_repo import (
     create_document,
     update_document_status,
