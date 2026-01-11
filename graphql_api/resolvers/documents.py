@@ -11,7 +11,17 @@ def get_documents(info: Info) -> List[DocumentType]:
     Fetch documents from Relational DB.
     """
     db = info.context.db
-    documents = db.query(Document).options(joinedload(Document.status)).all()
+    user = info.context.user
+
+    if user is None:
+        return []
+
+    documents = (
+        db.query(Document)
+        .options(joinedload(Document.status))
+        .filter(Document.user_id == user.id)
+        .all()
+    )
 
     return [
         DocumentType(

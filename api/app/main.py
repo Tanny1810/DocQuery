@@ -1,6 +1,7 @@
 # FastAPI main application
 
 from fastapi import FastAPI
+
 from app.core.config import settings
 from api.app.routers.router import router_v1
 
@@ -19,10 +20,7 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
 
     app.include_router(router_v1)
-    app.include_router(
-        graphql_app,
-        prefix="/graphql"
-    )
+    app.include_router(graphql_app, prefix="/graphql")
 
     return app
 

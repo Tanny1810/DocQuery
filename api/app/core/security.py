@@ -1,15 +1,19 @@
 import hashlib
 
 from datetime import datetime, timedelta
-from fastapi import Request, HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 
+from api.app.core.security_schemes import bearer_scheme
 from api.app.db.session import SessionLocal
 from api.app.schemas.v1.auth import RegisterRequest, LoginRequest, TokenResponse
 from api.app.models import User
+from api.app.db.session import get_db
+from api.app.core.jwt_utils import get_user_from_token
 from api.app.core.config import settings
 
 
@@ -60,30 +64,16 @@ def create_access_token(subject: str) -> str:
     )
 
 
-def get_current_user(request: Request) -> User:
-    auth_header = request.headers.get("Authorization")
-
-    if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    token = auth_header.split(" ")[1]
-
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id: str = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    db: Session = SessionLocal()
-    user = db.query(User).filter(User.id == user_id).first()
-
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db=Depends(get_db),
+):
+    user = get_user_from_token(credentials.credentials, db)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+        )
     return user
 
 

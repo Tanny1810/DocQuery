@@ -1,17 +1,20 @@
+from sqlalchemy.orm import Session
+
+from app.models import User
 from app.services.vector_search_service import search_similar_chunks
 from app.db.repositories.chunk_repo import get_chunks_for_rag
 from app.services.llm_service import call_llm
 from shared.rag.prompt_builder import build_prompt
 
 
-def query_documents(db, query: str, top_k: int):
+def query_documents(db: Session, query: str, top_k: int, current_user: User):
     # 1️⃣ Vector search
     vector_ids, distances = search_similar_chunks(query, top_k)
 
     distance_map = dict(zip(vector_ids, distances))
 
     # 2️⃣ Validate + fetch chunks from DB
-    rows = get_chunks_for_rag(db, vector_ids)
+    rows = get_chunks_for_rag(db=db, vector_ids=vector_ids, current_user=current_user)
 
     chunks = [
         {

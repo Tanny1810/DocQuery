@@ -2,6 +2,7 @@ from fastapi import UploadFile, File, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.services.storage import upload_file_to_s3
 from shared.constants.document_status import DocumentStatus
+from app.models import User
 from app.db.repositories.document_repo import (
     create_document,
     update_document_status,
@@ -13,7 +14,11 @@ from shared.config.logging import get_logger
 logger = get_logger(__name__)
 
 
-async def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_document(
+    file: UploadFile,
+    db: Session,
+    current_user: User,
+):
     if not file.filename:
         raise HTTPException(status_code=400, detail="Invalid file")
 
@@ -25,6 +30,7 @@ async def upload_document(file: UploadFile = File(...), db: Session = Depends(ge
 
         document = create_document(
             db=db,
+            user_id=current_user.id,
             original_filename=s3_metadata["original_name"],
             content_type=s3_metadata["content_type"],
             storage_provider="AWS",

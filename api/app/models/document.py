@@ -19,6 +19,12 @@ class Document(Base):
     __tablename__ = "documents"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=generate_uuid)
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
     original_filename = Column(String, nullable=False)
     content_type = Column(String, nullable=False)
     storage_provider = Column(String, nullable=False)
@@ -33,4 +39,6 @@ class Document(Base):
     retry_count = Column(Integer, nullable=True, default=0)
     max_retries = Column(Integer, nullable=True, default=3)
     last_error = Column(Text, nullable=True)
+
     status = relationship("DocumentStatus")
+    user = relationship("User")

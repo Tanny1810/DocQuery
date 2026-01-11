@@ -5,6 +5,7 @@ from app.models import Document
 def create_document(
     db: Session,
     *,
+    user_id: str,
     original_filename: str,
     content_type: str,
     storage_provider: str,
@@ -13,6 +14,7 @@ def create_document(
     status_id: int,
 ) -> Document:
     document = Document(
+        user_id=user_id,
         original_filename=original_filename,
         content_type=content_type,
         storage_provider=storage_provider,
