@@ -1,8 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Depends
 from sqlalchemy.orm import Session
+
 from app.db.session import get_db
-from shared.config.logging import get_logger
 from app.services.document_service import upload_document
+from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
 

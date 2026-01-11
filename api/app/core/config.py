@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     ENV: str = "dev"
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
+    JWT_SECRET_KEY: str = "CHANGE_ME_IN_PROD"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_MINUTES: int = 60
 
     CLOUD_CONFIG: Optional[CloudConfig] = None
     QUEUE_CONFIG: Optional[QueueConfig] = None
