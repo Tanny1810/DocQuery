@@ -6,6 +6,7 @@ from api.app.routers.router import router_v1
 
 from shared.config.logging import configure_logging
 from api.app.core.middleware import RequestIdMiddleware
+from graphql_api.main import graphql_app
 
 
 def create_app() -> FastAPI:
@@ -18,6 +19,10 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
 
     app.include_router(router_v1)
+    app.include_router(
+        graphql_app,
+        prefix="/graphql"
+    )
 
     return app
 

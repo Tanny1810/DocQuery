@@ -13,5 +13,6 @@ pydantic-settings
 python-multipart
 sentence-transformers
 sqlalchemy==2.0.30
+strawberry-graphql
 tiktoken
 uvicorn

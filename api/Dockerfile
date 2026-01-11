@@ -16,8 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy shared module
 COPY shared/ /app/shared/
 
-# Copy API application code
+# REST API (FastAPI)
 COPY api/ /app/api/
+
+# GraphQL control plane (NEW)
+COPY graphql_api/ /app/graphql_api/
 
 # Copy entrypoint script
 COPY api/entrypoint.sh /entrypoint.sh
