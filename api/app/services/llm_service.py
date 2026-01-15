@@ -4,14 +4,6 @@ from shared.config.logging import get_logger
 logger = get_logger(__name__)
 
 # -----------------------------
-# Constants
-# -----------------------------
-
-# GEMINI_MODEL = "gemini-2.5-flash-lite"
-GEMINI_MODEL = "gemini-2.5-flash"
-OPENAI_MODEL = "gpt-4o-mini"
-
-# -----------------------------
 # Provider Clients (lazy init)
 # -----------------------------
 
@@ -81,7 +73,7 @@ def _call_gemini(prompt: str) -> str:
     client = _get_gemini_client()
     try:
         response = client.models.generate_content(
-            model=GEMINI_MODEL,
+            model=settings.LLM_CONFIG.GEMINI_MODEL,
             contents=prompt,
             config=types.GenerateContentConfig(
                 temperature=0.2,
@@ -103,7 +95,7 @@ def _call_openai(prompt: str) -> str:
     client = _get_openai_client()
     try:
         response = client.chat.completions.create(
-            model=OPENAI_MODEL,
+            model=settings.LLM_CONFIG.OPENAI_MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
             max_tokens=512,
