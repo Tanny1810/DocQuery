@@ -297,111 +297,161 @@ docker-compose up --build
 
 ---
 
-## 🧭 Project Roadmap
+## 🧭 Project Roadmap & Versioned Capabilities
 
-DocQuery is being developed in **clear, versioned milestones**, with each release building on a stable foundation.  
-The roadmap reflects **planned direction**, not fixed timelines.
+DocQuery is a production-oriented Retrieval-Augmented Generation (RAG) backend designed to evolve from a secure, multi-tenant document QA system into a full document intelligence platform.
 
-> **Development & Deployment Strategy**  
-> DocQuery is developed locally using Docker and Docker Compose during early versions.  
-> Cloud deployment (AWS + Kubernetes) is intentionally planned for later stages once the platform reaches sufficient maturity.
+This document tracks **what is completed, what is in progress, and what is planned** across versions.
 
 ---
 
-### ✅ V1 – Core RAG Foundation (Completed)
+## ✅ V1 – Core RAG Foundation (**Completed**)
 
 **Focus:** Reliable ingestion & retrieval pipeline
 
-**Features**
-- Document upload and ingestion  
-- Async processing using background workers  
-- Chunking and embeddings  
-- Vector-based semantic search  
-- Retry handling and DLQ  
-- Explicit document lifecycle management  
+### Capabilities
+- Document upload and ingestion ✅  
+- Asynchronous processing using background workers (RabbitMQ) ✅  
+- Chunking and embedding generation ✅  
+- Vector-based semantic search (FAISS) ✅  
+- Retry handling and DLQ for failed jobs ✅  
+- Explicit document lifecycle management (QUEUED → READY / FAILED) ✅  
 
-**Status:** ✔ Stable
-
----
-
-### 🚀 V2 – Multi-User & Production-Grade RAG (Planned)
-
-**Focus:** Multi-tenancy, retrieval quality, and performance
-
-**Features**
-- User authentication (JWT-based)  
-- Document ownership and query isolation  
-- Enhanced RAG pipeline:
-  - Hybrid retrieval (vector + keyword)
-  - Smarter chunking (section / slide aware)
-  - Chunk re-ranking
-  - Answer confidence scores
-  - Richer source citations (page / slide)
-- Support for additional document formats:
-  - Improved PDF handling
-  - DOCX
-  - PPTX
-  - TXT / Markdown
-- Migration to a production-ready vector database  
-- Performance optimizations across ingestion and querying  
-
-**Improvements**
-- Stronger data isolation  
-- Higher answer accuracy  
-- Scalable vector storage  
-- Cleaner and more extensible ingestion pipeline  
-
-**Breaking changes**
-- Authentication becomes mandatory for all APIs  
-- All queries are scoped per user  
+### Status
+✔ **Stable and complete**  
+V1 establishes a solid event-driven RAG backend with clear document lifecycle guarantees.
 
 ---
 
-### 🚀 V3 – Platform, Monetization & Multimodal Support (Planned)
+## 🚀 V2 – Multi-User & Production-Grade RAG (**In Progress**)
 
-**Focus:** SaaS readiness, scalability, and broader content support
+**Focus:** Multi-tenancy, API maturity, retrieval quality, and production readiness
 
-**Features**
+---
+
+### 🔐 Authentication & Multi-Tenancy
+
+- JWT-based authentication (REST + GraphQL) ✅  
+- User registration and login APIs ✅  
+- Mandatory authentication for all APIs ✅  
+- Per-user document ownership enforced at DB level ✅  
+- Tenant-safe RAG retrieval (no cross-user leakage) ✅  
+
+**Status:** ✔ Completed
+
+---
+
+### 🌐 API Layer Enhancements
+
+- Read-only GraphQL API for queries ✅  
+- Secure GraphQL auth context (JWT-based) ✅  
+- `document(id)` GraphQL query with ownership checks ✅  
+- Cursor-based GraphQL pagination (connection pattern) ✅  
+- UsageStats GraphQL query (documents, chunks, queries) ✅  
+
+**Status:** ✔ Completed
+
+---
+
+### 🧠 RAG Architecture & Quality
+
+- Naive RAG implementation (vector → prompt → LLM) ✅  
+- Explicit “I don’t know” behavior for weak evidence ✅  
+- RAG strategy abstraction (pluggable RAG modes) ✅  
+
+**Planned / In Progress**
+- RAG debug metadata (retrieval & prompt introspection) 🔄  
+- Lightweight chunk reranking 🔄  
+- Hybrid retrieval (vector + keyword search) ⏳  
+- Answer confidence scoring ⏳  
+- Richer source attribution (page / chunk metadata) ⏳  
+
+---
+
+### 📄 Ingestion & Chunking Improvements
+
+**Planned**
+- Improved PDF parsing ⏳  
+- DOCX ingestion ⏳  
+- PPTX ingestion ⏳  
+- TXT / Markdown ingestion ⏳  
+- Smarter chunking (semantic + windowed strategies) ⏳  
+
+---
+
+### 🗄️ Infrastructure & Performance
+
+**Planned**
+- Migration from FAISS to a production-ready vector database (Qdrant / Weaviate / Pinecone) ⏳  
+- Internal gRPC communication between API and workers ⏳  
+- RAG request timeout handling and error hardening ⏳  
+- Persistent query audit trail per user ⏳  
+
+---
+
+### V2 Summary
+
+**Completed**
+- Secure multi-user architecture  
+- Production-grade GraphQL API  
+- Correct and extensible RAG foundation  
+
+**In Progress**
+- RAG quality improvements  
+- Retrieval robustness and observability  
+
+**Breaking Changes Introduced**
+- Authentication is mandatory  
+- All queries are user-scoped  
+
+---
+
+## 🚀 V3 – Platform, Monetization & Multimodal Support (**Planned**)
+
+**Focus:** SaaS readiness, scale, and broader content support
+
+### Planned Capabilities
 - Usage tracking and quotas  
 - Plan-based limits (free / paid tiers)  
 - API rate limiting and abuse protection  
-- API keys and webhooks  
-- SDK for easier third-party integration  
-- Audio document support (speech-to-text ingestion)  
-- Image document support (OCR-based ingestion)  
+- API keys and webhook support  
+- SDKs for third-party integration  
 
-**Infrastructure & Deployment**
-- Kubernetes-based deployment (AWS EKS or equivalent)
-- Container orchestration for API and worker services
-- Horizontal Pod Autoscaling (HPA) for background workers
-- Health checks, rolling updates, and self-healing
-- Environment-based configuration using ConfigMaps and Secrets
+### Multimodal Ingestion
+- Audio document ingestion (speech-to-text)  
+- Image-based document ingestion (OCR)  
 
-**Improvements**
-- Cost-aware system behavior  
-- Better developer experience  
-- Multimodal ingestion using the same RAG pipeline  
-- Improved reliability and scalability under load  
-
-**Breaking changes**
-- Requests may fail due to quota or rate limits (policy-level behavior changes)  
+### Infrastructure & Deployment
+- Kubernetes-based deployment (EKS or equivalent)  
+- Horizontal Pod Autoscaling (API + workers)  
+- Health checks, rolling deployments, self-healing  
+- Environment-based configuration (Secrets / ConfigMaps)  
 
 ---
 
-### 🚀 V4 – Agentic Document Intelligence (Future)
+## 🚀 V4 – Agentic Document Intelligence (**Future**)
 
-**Focus:** Intelligent, autonomous document workflows
+**Focus:** Autonomous, intelligent document workflows
 
-**Planned capabilities**
-- Agent-driven multi-step reasoning  
+### Planned Capabilities
+- Agent-driven multi-step reasoning over documents  
 - Tool-based document analysis (search, summarize, compare)  
-- Long-running tasks and workflow orchestration  
-- Memory-aware document reasoning  
+- Long-running document workflows  
+- Memory-aware reasoning across document collections  
 - Advanced document comparison and change tracking  
 
-**Notes**
-- This version may introduce new interaction patterns and APIs  
-- Scope will evolve based on platform maturity and user needs  
+### Notes
+- May introduce new interaction patterns and APIs  
+- Scope will evolve based on real usage and platform maturity  
+
+---
+
+## 🧭 Version Philosophy
+
+- **V1:** Make it work  
+- **V2:** Make it correct, secure, and extensible  
+- **V3:** Make it scalable and monetizable  
+- **V4:** Make it intelligent  
 
 ---
 
