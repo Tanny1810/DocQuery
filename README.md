@@ -353,11 +353,11 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 
 ---
 
-### 🧠 RAG Architecture & Quality
+### 🧠 RAG Architecture & Quality (Single-Mode)
 
 - Naive RAG implementation (vector → prompt → LLM) ✅  
 - Explicit “I don’t know” behavior for weak evidence ✅  
-- RAG strategy abstraction (pluggable RAG modes) ✅  
+- RAG strategy abstraction (pluggable architecture) ✅  
 
 **Planned / In Progress**
 - RAG debug metadata (retrieval & prompt introspection) 🔄  
@@ -365,6 +365,9 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - Hybrid retrieval (vector + keyword search) ⏳  
 - Answer confidence scoring ⏳  
 - Richer source attribution (page / chunk metadata) ⏳  
+
+> ⚠️ V2 intentionally supports **one primary RAG mode (fact-lookup)**.  
+> Multi-RAG selection is introduced in V3.
 
 ---
 
@@ -406,22 +409,46 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 
 ---
 
-## 🚀 V3 – Platform, Monetization & Multimodal Support (**Planned**)
+## 🚀 V3 – Platform, Monetization & Multi-RAG Support (**Planned**)
 
-**Focus:** SaaS readiness, scale, and broader content support
+**Focus:** SaaS readiness, scalable retrieval, and user-selectable RAG modes
 
-### Planned Capabilities
+---
+
+### 🧠 Multi-RAG Architecture (First-Class Feature)
+
+- User-selectable RAG modes via API / GraphQL  
+- Intent-aware RAG routing (fact vs list vs summary)  
+- Dedicated prompt templates per RAG mode  
+- Mode-specific retrieval strategies  
+
+### Supported RAG Types
+- **Fact Lookup RAG** (high-precision, low recall)  
+- **Hybrid RAG** (vector + keyword retrieval)  
+- **Summary RAG** (high-recall, aggregation-safe)  
+- **Document-Scoped RAG** (single document deep dives)  
+
+---
+
+### 💰 Platform & Monetization
+
 - Usage tracking and quotas  
 - Plan-based limits (free / paid tiers)  
 - API rate limiting and abuse protection  
 - API keys and webhook support  
 - SDKs for third-party integration  
 
-### Multimodal Ingestion
+---
+
+### 📄 Multimodal Ingestion
+
 - Audio document ingestion (speech-to-text)  
 - Image-based document ingestion (OCR)  
 
+---
+
 ### Infrastructure & Deployment
+
 - Kubernetes-based deployment (EKS or equivalent)  
 - Horizontal Pod Autoscaling (API + workers)  
 - Health checks, rolling deployments, self-healing  
@@ -429,19 +456,30 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 
 ---
 
-## 🚀 V4 – Agentic Document Intelligence (**Future**)
+## 🚀 V4 – Agentic & Adaptive RAG Intelligence (**Future**)
 
-**Focus:** Autonomous, intelligent document workflows
+**Focus:** Autonomous reasoning, adaptive retrieval, and document intelligence workflows
 
-### Planned Capabilities
-- Agent-driven multi-step reasoning over documents  
-- Tool-based document analysis (search, summarize, compare)  
-- Long-running document workflows  
-- Memory-aware reasoning across document collections  
-- Advanced document comparison and change tracking  
+---
+
+### 🤖 Advanced Multi-RAG Capabilities
+
+- Agent-driven RAG orchestration  
+- Dynamic RAG mode switching per query  
+- Multi-pass retrieval and self-refinement  
+- Confidence-aware answer verification  
+- Cross-document reasoning  
+
+### Planned RAG Types
+- **Comparative RAG** (document vs document)  
+- **Temporal RAG** (change tracking, diffs)  
+- **Workflow RAG** (multi-step tasks)  
+- **Memory-aware RAG** (long-term context retention)  
+
+---
 
 ### Notes
-- May introduce new interaction patterns and APIs  
+- V4 may introduce new interaction patterns and APIs  
 - Scope will evolve based on real usage and platform maturity  
 
 ---
@@ -450,8 +488,8 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 
 - **V1:** Make it work  
 - **V2:** Make it correct, secure, and extensible  
-- **V3:** Make it scalable and monetizable  
-- **V4:** Make it intelligent  
+- **V3:** Make it flexible, scalable, and monetizable  
+- **V4:** Make it intelligent and adaptive  
 
 ---
 
