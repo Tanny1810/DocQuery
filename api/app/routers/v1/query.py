@@ -24,5 +24,6 @@ def query_docs(
         db=db,
         query=payload.query,
         top_k=payload.top_k,
-        current_user=current_user,
+        user=current_user,
+        rag_mode=payload.rag_mode,
     )
