@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from api.app.core.rate_limit import RateLimitExceeded
 from app.models import User
 from app.schemas.v1.query import QueryRequest
 from app.services.rag_service import query_documents
@@ -20,10 +22,16 @@ def query_docs(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return query_documents(
-        db=db,
-        query=payload.query,
-        top_k=payload.top_k,
-        user=current_user,
-        rag_mode=payload.rag_mode,
-    )
+    try:
+        return query_documents(
+            db=db,
+            query=payload.query,
+            top_k=payload.top_k,
+            user=current_user,
+            rag_mode=payload.rag_mode,
+        )
+    except RateLimitExceeded as e:
+        raise HTTPException(
+            status_code=429,
+            detail=str(e),
+        )

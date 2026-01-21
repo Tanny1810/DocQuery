@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from api.app.schemas.v1.auth import RegisterRequest, LoginRequest, TokenResponse
-from api.app.models import User
-from api.app.core.security import register_user, check_user
-from api.app.db.session import get_db
+from app.schemas.v1.auth import RegisterRequest, LoginRequest, TokenResponse
+from app.models import User
+from app.core.security import register_user, check_user
+from app.db.session import get_db
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)

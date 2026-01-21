@@ -347,9 +347,13 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - Secure GraphQL auth context (JWT-based) ✅  
 - `document(id)` GraphQL query with ownership checks ✅  
 - Cursor-based GraphQL pagination (connection pattern) ✅  
-- UsageStats GraphQL query (documents, chunks, queries) ✅  
+- UsageStats GraphQL query (documents, chunks, queries) ✅
 
 **Status:** ✔ Completed
+> REST /query and GraphQL ask now call the same RAG service, with:
+>  - shared rate limits
+>  - shared audit
+>  - shared behavior
 
 ---
 
@@ -378,7 +382,10 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - DOCX ingestion ⏳  
 - PPTX ingestion ⏳  
 - TXT / Markdown ingestion ⏳  
-- Smarter chunking (semantic + windowed strategies) ⏳  
+- Smarter chunking (semantic + windowed strategies) ⏳
+
+> These intentionally come after RAG quality work.
+> There’s no point ingesting more formats until retrieval quality is measurable.
 
 ---
 
@@ -388,24 +395,31 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - Migration from FAISS to a production-ready vector database (Qdrant / Weaviate / Pinecone) ⏳  
 - Internal gRPC communication between API and workers ⏳  
 - RAG request timeout handling and error hardening ⏳  
-- Persistent query audit trail per user ⏳  
+- Persistent query audit trail per user ✅  
 
 ---
 
 ### V2 Summary
 
 **Completed**
-- Secure multi-user architecture  
-- Production-grade GraphQL API  
-- Correct and extensible RAG foundation  
+- Secure multi-user architecture
+- JWT auth across REST & GraphQL
+- Production-grade GraphQL API
+- Cursor pagination
+- UsageStats with real accounting
+- Query audit ledger
+- Rate limiting (quota-based)
+- Clean service-layer RAG orchestration 
 
 **In Progress**
 - RAG quality improvements  
-- Retrieval robustness and observability  
+- Retrieval robustness and observability
+- Debuggability for ranking & prompts
 
 **Breaking Changes Introduced**
 - Authentication is mandatory  
-- All queries are user-scoped  
+- All queries are user-scoped
+- Rate limits enforced per user
 
 ---
 

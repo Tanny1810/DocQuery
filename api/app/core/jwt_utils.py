@@ -1,8 +1,8 @@
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from api.app.core.config import settings
-from api.app.models import User
+from app.core.config import settings
+from app.models import User
 
 
 def get_user_from_token(token: str, db: Session) -> User | None:
