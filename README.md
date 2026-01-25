@@ -134,6 +134,9 @@ sequenceDiagram
                                     Vector Search (Top-K chunks)
                                         │
                                         ▼
+                                    Re-ranking chunks
+                                        │
+                                        ▼
                                     LLM (Context + Question)
                                         │
                                         ▼
@@ -364,10 +367,10 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - RAG strategy abstraction (pluggable architecture) ✅  
 
 **Planned / In Progress**
-- RAG debug metadata (retrieval & prompt introspection) 🔄  
-- Lightweight chunk reranking 🔄  
-- Hybrid retrieval (vector + keyword search) ⏳  
-- Answer confidence scoring ⏳  
+- RAG debug metadata (retrieval & prompt introspection) ✅  
+- Lightweight chunk reranking ✅  
+- Hybrid retrieval (vector + keyword search) 🔄  
+- Answer confidence scoring 🔄  
 - Richer source attribution (page / chunk metadata) ⏳  
 
 > ⚠️ V2 intentionally supports **one primary RAG mode (fact-lookup)**.  
