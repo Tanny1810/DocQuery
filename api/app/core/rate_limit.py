@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.db.repositories.query_audit_repo import count_queries_since
+from app.core.config import settings
 
 
 # V2: simple daily quota
@@ -22,7 +23,7 @@ def check_rate_limit(
 
     query_count = count_queries_since(db, user_id, since)
 
-    if query_count >= DAILY_QUERY_LIMIT:
+    if query_count >= settings.DAILY_QUERY_LIMIT:
         raise RateLimitExceeded(
             f"Daily query limit of {DAILY_QUERY_LIMIT} exceeded"
         )

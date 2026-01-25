@@ -2,6 +2,8 @@
 import strawberry
 from typing import List
 
+from graphql_api.types.rag_debug import RAGDebugMetadataType
+
 
 @strawberry.type
 class Source:
@@ -14,3 +16,4 @@ class RAGResponse:
     answer: str
     sources: List[Source]
     confidence: float | None = None
+    debug: RAGDebugMetadataType | None

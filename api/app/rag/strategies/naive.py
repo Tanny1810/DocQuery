@@ -64,6 +64,22 @@ class NaiveRAGStrategy(RAGStrategy):
         # 6️⃣ LLM call
         answer = call_llm(prompt)
 
+        debug_metadata = {
+            "retrieved_chunks": [
+                {
+                    "document_id": str(c["document_id"]),
+                    "chunk_index": c["chunk_index"],
+                    "distance": c["distance"],
+                    "rerank_score": c["rerank_score"],
+                }
+                for c in chunks
+            ],
+            "retrieved_count": len(chunks),
+            "used_in_prompt": len(chunks_for_prompt),
+            "prompt_length": len(prompt),
+            "fallback_used": False,
+        }
+
         return {
             "answer": answer,
             "sources": [
@@ -74,6 +90,7 @@ class NaiveRAGStrategy(RAGStrategy):
                 for c in chunks_for_prompt
             ],
             "confidence": self._estimate_confidence(chunks_for_prompt),
+            "debug": debug_metadata,
         }
 
     def _estimate_confidence(self, chunks: list[dict]) -> float:

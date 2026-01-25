@@ -5,6 +5,7 @@ from strawberry.exceptions import GraphQLError
 from api.app.services.rag_service import query_documents
 from api.app.core.rate_limit import RateLimitExceeded
 from graphql_api.types.rag import RAGResponse, Source
+from graphql_api.types.rag_debug import RAGDebugMetadataType, RetrievedChunkDebugType
 
 
 def query_documents_resolver(
@@ -23,6 +24,7 @@ def query_documents_resolver(
         top_k=top_k,
         user=user,
     )
+    debug = result.get("debug")
     try:
         return RAGResponse(
             answer=result["answer"],
@@ -34,7 +36,19 @@ def query_documents_resolver(
                 )
                 for s in result["sources"]
             ],
-            confidence=result.get("confidence"),
+            debug=(
+                RAGDebugMetadataType(
+                    retrieved_chunks=[
+                        RetrievedChunkDebugType(**c) for c in debug["retrieved_chunks"]
+                    ],
+                    retrieved_count=debug["retrieved_count"],
+                    used_in_prompt=debug["used_in_prompt"],
+                    prompt_length=debug["prompt_length"],
+                    fallback_used=debug["fallback_used"],
+                )
+                if debug
+                else None
+            ),
         )
     except RateLimitExceeded as e:
         # ✅ GraphQL-friendly error

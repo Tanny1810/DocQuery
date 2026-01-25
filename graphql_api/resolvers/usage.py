@@ -20,7 +20,6 @@ def get_usage(info: Info) -> UsageType:
             total_documents=0,
             total_chunks=0,
             total_queries=0,
-            total_storage_used_mb=0.0,
         )
 
     # 1️⃣ Total documents

@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "CHANGE_ME_IN_PROD"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60
+    DAILY_QUERY_LIMIT: int = 5
 
     CLOUD_CONFIG: Optional[CloudConfig] = None
     QUEUE_CONFIG: Optional[QueueConfig] = None
