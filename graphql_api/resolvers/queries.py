@@ -26,6 +26,7 @@ def query_documents_resolver(
     try:
         return RAGResponse(
             answer=result["answer"],
+            confidence=result["confidence"],
             sources=[
                 Source(
                     document_id=str(s["document_id"]),
