@@ -367,13 +367,13 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - Naive RAG implementation (vector → prompt → LLM) ✅  
 - Explicit “I don’t know” behavior for weak evidence ✅  
 - RAG strategy abstraction (pluggable architecture) ✅  
-
-**Planned / In Progress**
 - RAG debug metadata (retrieval & prompt introspection) ✅  
 - Lightweight chunk reranking ✅  
-- Hybrid retrieval (vector + keyword search) 🔄  
-- Answer confidence scoring 🔄  
-- Richer source attribution (page / chunk metadata) ⏳  
+- Hybrid retrieval (vector + keyword search) ✅  
+- Answer confidence scoring ✅ 
+
+**Planned / In Progress** 
+- Richer source attribution (page / chunk metadata) 🔄  
 
 > ⚠️ V2 intentionally supports **one primary RAG mode (fact-lookup)**.  
 > Multi-RAG selection is introduced in V3.
@@ -395,12 +395,13 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 ---
 
 ### 🗄️ Infrastructure & Performance
+- Persistent query audit trail per user ✅
+- Rate limiting (quota-based) ✅
 
 **Planned**
 - Migration from FAISS to a production-ready vector database (Qdrant / Weaviate / Pinecone) ⏳  
 - Internal gRPC communication between API and workers ⏳  
 - RAG request timeout handling and error hardening ⏳  
-- Persistent query audit trail per user ✅  
 
 ---
 
@@ -414,12 +415,13 @@ V1 establishes a solid event-driven RAG backend with clear document lifecycle gu
 - UsageStats with real accounting
 - Query audit ledger
 - Rate limiting (quota-based)
-- Clean service-layer RAG orchestration 
-
-**In Progress**
+- Clean service-layer RAG orchestration
 - RAG quality improvements  
 - Retrieval robustness and observability
 - Debuggability for ranking & prompts
+
+**In Progress**
+- Richer source attribution
 
 **Breaking Changes Introduced**
 - Authentication is mandatory  
