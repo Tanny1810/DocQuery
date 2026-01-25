@@ -125,22 +125,24 @@ sequenceDiagram
 
 ## 🧠 RAG Processing Flow
 
-                                    User Query
-                                        │
-                                        ▼
-                                    FastAPI API
-                                        │
-                                        ▼
-                                    Vector Search (Top-K chunks)
-                                        │
-                                        ▼
-                                    Re-ranking chunks
-                                        │
-                                        ▼
+                                        User Query
+                          __________________│__________________
+                          ▼                                   ▼
+          Vector Search (semantic recall)         BM25 Search (lexical recall)
+                          │                                   │
+                          └─────────────────┬─────────────────┘
+                                            ▼
+                                    Union of candidates
+                                            │
+                                            ▼
+                                    Reranking (judgment)
+                                            │
+                                            ▼
                                     LLM (Context + Question)
-                                        │
-                                        ▼
-                                    Final Answer
+                                            │
+                                            ▼
+                                        Final Answer
+
 
 ---
 

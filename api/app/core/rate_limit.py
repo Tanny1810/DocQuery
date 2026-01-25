@@ -6,10 +6,6 @@ from app.db.repositories.query_audit_repo import count_queries_since
 from app.core.config import settings
 
 
-# V2: simple daily quota
-DAILY_QUERY_LIMIT = 5
-
-
 class RateLimitExceeded(Exception):
     pass
 
@@ -25,5 +21,5 @@ def check_rate_limit(
 
     if query_count >= settings.DAILY_QUERY_LIMIT:
         raise RateLimitExceeded(
-            f"Daily query limit of {DAILY_QUERY_LIMIT} exceeded"
+            f"Daily query limit of {settings.DAILY_QUERY_LIMIT} exceeded"
         )
