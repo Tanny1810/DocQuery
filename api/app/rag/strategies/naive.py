@@ -117,9 +117,18 @@ class NaiveRAGStrategy(RAGStrategy):
         }
 
     def _estimate_confidence(self, chunks: list[dict]) -> float:
-        # Simple heuristic for now (V2-safe)
-        best_distance = chunks[0]["distance"]
-        return max(0.0, min(1.0, 1 - best_distance))
+        best = chunks[0]["rerank_score"]
+        second = chunks[1]["rerank_score"] if len(chunks) > 1 else 0
+
+        # strength of evidence
+        strength = best
+
+        # separation of evidence
+        separation = best - second
+
+        confidence = min(1.0, max(0.0, 0.7 * strength + 0.3 * separation))
+
+        return confidence
 
     def _rerank_chunks(self, *, query: str, chunks: list[dict]) -> list[dict]:
         query_tokens = set(query.lower().split())
@@ -127,8 +136,10 @@ class NaiveRAGStrategy(RAGStrategy):
         for c in chunks:
             chunk_tokens = set(c["content"].lower().split())
 
-            semantic_score = 1 - c["distance"]
+            semantic_score = 1 / (1 + c["distance"])
+
             keyword_overlap = len(query_tokens & chunk_tokens)
+            keyword_overlap_norm = min(keyword_overlap / 2, 1.0)
 
             # Penalize very long chunks (simple heuristic)
             length_penalty = min(len(c["content"]) / 1000, 1.0)
@@ -136,9 +147,9 @@ class NaiveRAGStrategy(RAGStrategy):
             bm25_bonus = 0.1 if c.get("bm25_hit") else 0.0
 
             c["rerank_score"] = (
-                0.7 * semantic_score
-                + 0.2 * keyword_overlap
-                + bm25_bonus
+                0.55 * semantic_score
+                + 0.25 * keyword_overlap_norm
+                + (0.2 if bm25_bonus else 0.0)
                 - 0.1 * length_penalty
             )
 
