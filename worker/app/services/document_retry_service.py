@@ -1,19 +1,18 @@
-from shared.constants.document_status import DocumentStatus
+from app.core.config import settings
 from app.db.document_repo import (
     get_document_for_update,
     increment_retry_count,
     update_document_status,
 )
+from shared.constants.document_status import DocumentStatus
 from shared.messaging.rabbit_mq import publish_message
+from shared.messaging.routing_keys import DOCUMENT_RETRY, DOCUMENT_DLQ
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
 
-MAIN_QUEUE = "document_ingestion"
-DLQ_QUEUE = "document_ingestion.dlq"
 
-
-def increment_retry_or_fail(document_id, exc: Exception):
+async def increment_retry_or_fail(document_id, exc: Exception):
     doc = get_document_for_update(document_id)
 
     if doc["retry_count"] < doc["max_retries"]:
@@ -24,9 +23,13 @@ def increment_retry_or_fail(document_id, exc: Exception):
             DocumentStatus.RETRYING,
         )
 
-        publish_message(
-            {"document_id": str(document_id)},
-            queue=MAIN_QUEUE,
+        await publish_message(
+            {
+                "document_id": str(document_id),
+                "retry": True,
+                "attempt": doc["retry_count"] + 1,
+            },
+            routing_key=DOCUMENT_RETRY,
         )
 
         logger.warning(
@@ -40,14 +43,14 @@ def increment_retry_or_fail(document_id, exc: Exception):
             DocumentStatus.FAILED,
         )
 
-        publish_message(
+        await publish_message(
             {
                 "document_id": str(document_id),
                 "reason": "MAX_RETRIES_EXCEEDED",
                 "retry_count": doc["retry_count"],
                 "error": str(exc),
             },
-            queue=DLQ_QUEUE,
+            routing_key=DOCUMENT_DLQ,
         )
 
         logger.error(f"☠️ Document {document_id} sent to DLQ")

@@ -52,19 +52,28 @@ class NaiveRAGStrategy(RAGStrategy):
                 "document_id": row.document_id,
                 "chunk_index": row.chunk_index,
                 "content": row.content,
+                # BM25-only hit → neutral semantic distance
                 "distance": vector_distance_map.get(row.vector_id, 1.0),
-                "bm25_hit": False,
+                "filename": row.filename,
+                "page_number": row.page_number,
+                "section_title": row.section_title,
+                "bm25_hit": True,
             }
 
         # BM25 results
         for row in bm25_rows:
             key = (row.document_id, row.chunk_index)
+
             if key not in chunks_by_key:
                 chunks_by_key[key] = {
                     "document_id": row.document_id,
                     "chunk_index": row.chunk_index,
                     "content": row.content,
-                    "distance": 1.0,  # no vector distance
+                    # BM25-only hit → neutral semantic distance
+                    "distance": vector_distance_map.get(row.vector_id, 1.0),
+                    "filename": row.filename,
+                    "page_number": row.page_number,
+                    "section_title": row.section_title,
                     "bm25_hit": True,
                 }
             else:
@@ -93,6 +102,9 @@ class NaiveRAGStrategy(RAGStrategy):
                     "chunk_index": c["chunk_index"],
                     "distance": c["distance"],
                     "rerank_score": c["rerank_score"],
+                    "page_number": c.get("page_number"),
+                    "section_title": c.get("section_title"),
+                    "filename": c["filename"],
                 }
                 for c in chunks
             ],
@@ -107,8 +119,12 @@ class NaiveRAGStrategy(RAGStrategy):
             "answer": answer,
             "sources": [
                 {
-                    "document_id": c["document_id"],
+                    "document_id": str(c["document_id"]),
+                    "filename": c["filename"],
                     "chunk_index": c["chunk_index"],
+                    "page_number": c.get("page_number"),
+                    "section_title": c.get("section_title"),
+                    "score": c["rerank_score"],
                 }
                 for c in chunks_for_prompt
             ],

@@ -17,7 +17,10 @@ class QueueConfig(BaseSettings):
     RABBITMQ_PASSWORD: str = ""
     RABBITMQ_HOST: str = ""
     RABBITMQ_PORT: int = 5672
-    QUEUE_NAME: str = ""
+    RABBITMQ_EXCHANGE: str = ""
+    QUEUE_MAIN: str = ""
+    QUEUE_RETRY: str = ""
+    QUEUE_DLQ: str = ""
 
 
 class DBConfig(BaseSettings):

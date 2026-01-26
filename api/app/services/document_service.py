@@ -1,4 +1,4 @@
-from fastapi import UploadFile, File, HTTPException, Depends
+from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from app.services.storage import upload_file_to_s3
 from shared.constants.document_status import DocumentStatus
@@ -7,8 +7,8 @@ from app.db.repositories.document_repo import (
     create_document,
     update_document_status,
 )
-from app.db.session import get_db
 from shared.messaging.rabbit_mq import publish_message
+from shared.messaging.routing_keys import DOCUMENT_PROCESS
 from shared.config.logging import get_logger
 
 logger = get_logger(__name__)
@@ -43,7 +43,8 @@ async def upload_document(
         await publish_message(
             {
                 "document_id": str(document.id),
-            }
+            },
+            routing_key=DOCUMENT_PROCESS,
         )
 
         return {

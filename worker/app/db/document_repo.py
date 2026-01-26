@@ -100,12 +100,26 @@ def insert_chunks(document_id, chunks, vector_ids):
     cur = conn.cursor()
 
     values = [
-        (document_id, idx, content, vector_id)
-        for idx, (content, vector_id) in enumerate(zip(chunks, vector_ids))
+        (
+            document_id,
+            chunk["chunk_index"],
+            chunk["content"],
+            vector_id,
+            chunk.get("page_number"),
+            chunk.get("section_title"),
+        )
+        for chunk, vector_id in zip(chunks, vector_ids)
     ]
 
     query = """
-        INSERT INTO chunks (document_id, chunk_index, content, vector_id)
+        INSERT INTO chunks (
+            document_id,
+            chunk_index,
+            content,
+            vector_id,
+            page_number,
+            section_title
+        )
         VALUES %s
         ON CONFLICT (document_id, chunk_index) DO NOTHING
     """

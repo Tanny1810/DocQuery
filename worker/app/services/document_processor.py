@@ -1,7 +1,7 @@
 from app.services.storage_service import download_file
-from app.processors.text_extractor import extract_text, clean_text
-from app.processors.chunker import chunk_text
-from shared.embeddings.embedder import embed_chunks
+from app.services.document_retry_service import increment_retry_or_fail
+from app.processors.chunker import chunk_pages
+from app.processors.extractor_factory import get_extractor
 from app.db.vector_store import store_embeddings, get_vector_count
 from app.db.document_repo import (
     update_document_status,
@@ -9,7 +9,7 @@ from app.db.document_repo import (
     get_document_for_update,
     insert_chunks,
 )
-from app.services.document_retry_service import increment_retry_or_fail
+from shared.embeddings.embedder import embed_chunks
 from shared.constants.document_status import DocumentStatus
 from shared.config.logging import get_logger
 
@@ -23,7 +23,10 @@ async def process_document(payload: dict):
 
     doc = get_document_for_update(document_id)
 
-    if doc["status_id"] != DocumentStatus.QUEUED:
+    if doc["status_id"] not in (
+        DocumentStatus.QUEUED,
+        DocumentStatus.RETRYING,
+    ):
         logger.info(f"⏭️ Skipping document {document_id}, " f"status={doc['status_id']}")
         return
 
@@ -32,6 +35,7 @@ async def process_document(payload: dict):
     try:
         # 0️⃣ Mark PROCESSING
         update_document_status(document_id, DocumentStatus.PROCESSING)
+
         # 1️⃣ Fetch storage info from DB (SOURCE OF TRUTH)
         storage = get_document_storage_info(document_id)
 
@@ -41,21 +45,28 @@ async def process_document(payload: dict):
             bucket=storage["storage_bucket"],
             key=storage["storage_key"],
         )
+        # 3️⃣ Get extractor via factory (format-agnostic)
+        extractor = get_extractor(file_path)
+        blocks = extractor.extract(file_path)
 
-        # 3️⃣ Extract text
-        text = extract_text(file_path)
+        if not blocks:
+            raise ValueError("No text extracted from document")
+        
+        for i, block in enumerate(blocks):
+            if "text" not in block:
+                raise ValueError(
+                    f"Invalid block at index {i}: missing 'text' key. Block={block}"
+                )
 
-        # 🔧 CLEAN HERE
-        text = clean_text(text)
-
-        # 4️⃣ Chunk text
-        chunks = chunk_text(text)
+        # 4️⃣ Page-aware chunking
+        chunks = chunk_pages(blocks)
 
         if not chunks:
             raise ValueError("No chunks generated from document")
 
-        # 5️⃣ Embed
-        embeddings = embed_chunks(chunks)
+        # 5️⃣ Embed ONLY chunk content
+        texts = [c["content"] for c in chunks]
+        embeddings = embed_chunks(texts)
 
         # 6️⃣ Store embeddings
         vector_ids = store_embeddings(embeddings)
@@ -63,19 +74,21 @@ async def process_document(payload: dict):
         logger.info(f"✅ Stored {len(embeddings)} embeddings")
         logger.info(f"📊 Total vectors in FAISS: {get_vector_count()}")
 
+        # 7️⃣ Persist chunks with page_number
         insert_chunks(
             document_id=document_id,
             chunks=chunks,
             vector_ids=vector_ids,
         )
+
         logger.info(f"✅ Stored {len(chunks)} chunks")
 
-        # 7️⃣ Mark READY
+        # 8️⃣ Mark READY
         update_document_status(document_id, DocumentStatus.READY)
 
     except Exception as exc:
         logger.exception(f"❌ Failed processing document {document_id}: {exc}")
-        increment_retry_or_fail(document_id, exc)
+        await increment_retry_or_fail(document_id, exc)
         return
 
     finally:

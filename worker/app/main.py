@@ -9,8 +9,4 @@ from app.core.config import settings
 if __name__ == "__main__":
     # configure global logging early
     configure_logging(settings.LOG_LEVEL)
-    asyncio.run(
-        start_document_consumer(
-            queue_name=settings.QUEUE_CONFIG.QUEUE_NAME,
-        )
-    )
+    asyncio.run(start_document_consumer())

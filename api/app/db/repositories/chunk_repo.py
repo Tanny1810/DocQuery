@@ -18,6 +18,9 @@ def get_chunks_for_rag(
             Chunk.chunk_index,
             Chunk.content,
             Chunk.vector_id,
+            Chunk.page_number,
+            Chunk.section_title,
+            Document.original_filename.label("filename"),
         )
         .join(Document, Document.id == Chunk.document_id)
         .filter(
@@ -27,6 +30,7 @@ def get_chunks_for_rag(
         )
         .all()
     )
+
 
 def search_chunks_bm25(
     *,
@@ -50,20 +54,18 @@ def search_chunks_bm25(
             Chunk.chunk_index,
             Chunk.content,
             Chunk.id.label("vector_id"),
+            Chunk.page_number,
+            Chunk.section_title,
+            Document.original_filename.label("filename")
         )
         .join(Document, Document.id == Chunk.document_id)
         .filter(
             Document.user_id == current_user.id,
-            Document.status_id.in_(
-                [DocumentStatus.READY, DocumentStatus.PARTIAL]
-            ),
+            Document.status_id.in_([DocumentStatus.READY, DocumentStatus.PARTIAL]),
             Chunk.tsv.op("@@")(ts_query),
         )
         .order_by(
-            func.ts_rank(
-                Chunk.tsv,
-                func.plainto_tsquery("english", query)
-            ).desc()
+            func.ts_rank(Chunk.tsv, func.plainto_tsquery("english", query)).desc()
         )
         .params(query=query)
         .limit(limit)
