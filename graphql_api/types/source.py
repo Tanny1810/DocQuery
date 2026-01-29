@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @strawberry.type
-class Source:
+class SourceType:
     document_id: str
     filename: str
     chunk_index: int

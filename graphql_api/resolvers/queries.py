@@ -4,8 +4,8 @@ from strawberry.exceptions import GraphQLError
 
 from api.app.services.rag_service import query_documents
 from api.app.core.rate_limit import RateLimitExceeded
-from graphql_api.types.rag import RAGResponse, Source
-from graphql_api.types.rag_debug import RAGDebugMetadataType, RetrievedChunkDebugType
+from graphql_api.types.rag import RAGResponse, SourceType
+from graphql_api.types.rag_debug import RAGDebugMetadataType
 
 
 def query_documents_resolver(
@@ -30,16 +30,28 @@ def query_documents_resolver(
             answer=result["answer"],
             confidence=result["confidence"],
             sources=[
-                Source(
-                    document_id=str(s["document_id"]),
-                    chunk_index=s["chunk_index"],
+                SourceType(
+                    document_id=str(s.document_id),
+                    filename=s.filename,
+                    chunk_index=s.chunk_index,
+                    page_number=s.page_number,
+                    section_title=s.section_title,
+                    score=s.score,
                 )
                 for s in result["sources"]
             ],
             debug=(
                 RAGDebugMetadataType(
                     retrieved_chunks=[
-                        RetrievedChunkDebugType(**c) for c in debug["retrieved_chunks"]
+                        SourceType(
+                            document_id=str(c.document_id),
+                            filename=c.filename,
+                            chunk_index=c.chunk_index,
+                            page_number=c.page_number,
+                            section_title=c.section_title,
+                            score=c.score,
+                        )
+                        for c in debug["retrieved_chunks"]
                     ],
                     retrieved_count=debug["retrieved_count"],
                     used_in_prompt=debug["used_in_prompt"],

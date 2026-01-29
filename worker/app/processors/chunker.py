@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+from app.processors.types import ExtractedBlock
+
 
 def chunk_text(
     text: str,
@@ -20,7 +22,7 @@ def chunk_text(
 
 
 def chunk_pages(
-    pages: List[Dict],
+    pages: List[ExtractedBlock],
     chunk_size: int = 650,
     overlap: int = 125,
 ) -> List[Dict]:

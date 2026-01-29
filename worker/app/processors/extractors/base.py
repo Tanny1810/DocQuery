@@ -1,19 +1,21 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
+
+from app.processors.types import ExtractedBlock
 
 
 class DocumentExtractor(ABC):
     @abstractmethod
-    def extract(self, file_path: Path) -> List[Dict]:
+    def extract(self, file_path: Path) -> List[ExtractedBlock]:
         """
         Must return:
         [
             {
-                "content": str,
+                "text": str,
                 "page_number": Optional[int],
                 "section_title": Optional[str],
             }
         ]
         """
-        pass
+        raise NotImplementedError

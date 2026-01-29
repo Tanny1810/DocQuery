@@ -36,7 +36,7 @@ def query_documents(
         user_id=user.id,
         query_text=query,
         rag_mode=rag_mode,
-        document_ids=[str(src["document_id"]) for src in result.get("sources", [])],
+        document_ids=[str(src.document_id) for src in result.get("sources", [])],
     )
 
     return result

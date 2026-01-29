@@ -3,17 +3,12 @@ import strawberry
 from typing import List
 
 from graphql_api.types.rag_debug import RAGDebugMetadataType
-
-
-@strawberry.type
-class Source:
-    document_id: str
-    chunk_index: int
+from graphql_api.types.source import SourceType
 
 
 @strawberry.type
 class RAGResponse:
     answer: str
-    sources: List[Source]
+    sources: List[SourceType]
     confidence: float | None = None
     debug: RAGDebugMetadataType | None

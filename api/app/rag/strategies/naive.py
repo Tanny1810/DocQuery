@@ -4,9 +4,9 @@ from app.models import User
 from app.services.vector_search_service import search_similar_chunks
 from app.db.repositories.chunk_repo import get_chunks_for_rag, search_chunks_bm25
 from app.services.llm_service import call_llm
-from shared.rag.prompt_builder import build_prompt
-
+from app.rag.types import Source
 from app.rag.strategies.base import RAGStrategy, RAGResult
+from shared.rag.prompt_builder import build_prompt
 
 MAX_PROMPT_CHUNKS = 6
 
@@ -97,15 +97,14 @@ class NaiveRAGStrategy(RAGStrategy):
 
         debug_metadata = {
             "retrieved_chunks": [
-                {
-                    "document_id": str(c["document_id"]),
-                    "chunk_index": c["chunk_index"],
-                    "distance": c["distance"],
-                    "rerank_score": c["rerank_score"],
-                    "page_number": c.get("page_number"),
-                    "section_title": c.get("section_title"),
-                    "filename": c["filename"],
-                }
+                Source(
+                    document_id=c["document_id"],
+                    filename=c["filename"],
+                    chunk_index=c["chunk_index"],
+                    page_number=c.get("page_number"),
+                    section_title=c.get("section_title"),
+                    score=c["rerank_score"],
+                )
                 for c in chunks
             ],
             "retrieved_count": len(chunks),
@@ -118,14 +117,14 @@ class NaiveRAGStrategy(RAGStrategy):
         return {
             "answer": answer,
             "sources": [
-                {
-                    "document_id": str(c["document_id"]),
-                    "filename": c["filename"],
-                    "chunk_index": c["chunk_index"],
-                    "page_number": c.get("page_number"),
-                    "section_title": c.get("section_title"),
-                    "score": c["rerank_score"],
-                }
+                Source(
+                    document_id=c["document_id"],
+                    filename=c["filename"],
+                    chunk_index=c["chunk_index"],
+                    page_number=c.get("page_number"),
+                    section_title=c.get("section_title"),
+                    score=c["rerank_score"],
+                )
                 for c in chunks_for_prompt
             ],
             "confidence": self._estimate_confidence(chunks_for_prompt),

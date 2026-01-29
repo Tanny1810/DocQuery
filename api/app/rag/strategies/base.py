@@ -2,18 +2,13 @@ from typing import TypedDict, List, Optional
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 
-from app.rag.types import RAGDebugMetadata
+from app.rag.types import RAGDebugMetadata, Source
 from app.models import User
-
-
-class RAGSource(TypedDict):
-    document_id: str
-    chunk_index: int
 
 
 class RAGResult(TypedDict):
     answer: str
-    sources: List[RAGSource]
+    sources: List[Source]
     confidence: Optional[float]
     debug: Optional[RAGDebugMetadata]
 
